@@ -10,10 +10,10 @@ from unittest import mock
 
 import pytest
 
-from coverage.exceptions import CoverageException
-from coverage.misc import file_be_gone
-from coverage.misc import Hasher, substitute_variables, import_third_party
-from coverage.misc import human_sorted, human_sorted_items, stdout_link
+from test_conclude.exceptions import CoverageException
+from test_conclude.misc import file_be_gone
+from test_conclude.misc import Hasher, substitute_variables, import_third_party
+from test_conclude.misc import human_sorted, human_sorted_items, stdout_link
 
 from tests.coveragetest import CoverageTest
 

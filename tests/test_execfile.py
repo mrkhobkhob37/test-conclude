@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Tests for coverage.execfile"""
+"""Tests for test_conclude.execfile"""
 
 from __future__ import annotations
 
@@ -18,9 +18,9 @@ from typing import Any, Iterator
 
 import pytest
 
-from coverage.exceptions import NoCode, NoSource, _ExceptionDuringRun
-from coverage.execfile import run_python_file, run_python_module
-from coverage.files import python_reported_file
+from test_conclude.exceptions import NoCode, NoSource, _ExceptionDuringRun
+from test_conclude.execfile import run_python_file, run_python_module
+from test_conclude.files import python_reported_file
 
 from tests.coveragetest import CoverageTest, TESTS_DIR, UsingModulesMixin
 

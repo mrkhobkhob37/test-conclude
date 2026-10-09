@@ -7,12 +7,12 @@ from __future__ import annotations
 
 from typing import Any, List, cast
 
-import coverage
-from coverage.plugin_support import Plugins
-from coverage.types import TConfigurable
+import test_conclude
+from test_conclude.plugin_support import Plugins
+from test_conclude.types import TConfigurable
 
 
-class Plugin(coverage.CoveragePlugin):
+class Plugin(test_conclude.CoveragePlugin):
     """A configuring plugin for testing."""
     def configure(self, config: TConfigurable) -> None:
         """Configure all the things!"""

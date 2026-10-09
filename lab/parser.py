@@ -14,8 +14,8 @@ import sys
 import textwrap
 import types
 
-from coverage.parser import PythonParser
-from coverage.python import get_python_source
+from test_conclude.parser import PythonParser
+from test_conclude.python import get_python_source
 
 
 class ParserMain:

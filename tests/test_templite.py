@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Tests for coverage.templite."""
+"""Tests for test_conclude.templite."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from typing import Any, ContextManager
 
 import pytest
 
-from coverage.templite import Templite, TempliteSyntaxError, TempliteValueError
+from test_conclude.templite import Templite, TempliteSyntaxError, TempliteValueError
 
 from tests.coveragetest import CoverageTest
 

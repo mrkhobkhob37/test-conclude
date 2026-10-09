@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import os.path
 
-import coverage
+import test_conclude
 
 from tests.coveragetest import CoverageTest
 from tests.helpers import CheckUniqueFilenames
@@ -40,7 +40,7 @@ class CollectorTest(CoverageTest):
 
         # Trace one file, but not the other. CheckUniqueFilenames will assert
         # that _should_trace hasn't been called twice for the same file.
-        cov = coverage.Coverage(include=["f1.py"])
+        cov = test_conclude.Coverage(include=["f1.py"])
         should_trace_hook = CheckUniqueFilenames.hook(cov, '_should_trace')
 
         # Import the Python file, executing it.

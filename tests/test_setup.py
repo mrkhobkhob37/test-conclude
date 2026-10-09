@@ -9,7 +9,7 @@ import sys
 
 from typing import List, cast
 
-import coverage
+import test_conclude
 
 from tests.coveragetest import CoverageTest
 
@@ -31,7 +31,8 @@ class SetupPyTest(CoverageTest):
         assert status == 0
         out = output.splitlines()
         assert "measurement" in out[0]
-        assert coverage.__version__ == out[1]
+        assert test_conclude.FORK_VERSION == out[1]
+        assert test_conclude.__version__ == "7.5.0"
         assert "github.com/nedbat/coveragepy" in out[2]
         assert "Ned Batchelder" in out[3]
 

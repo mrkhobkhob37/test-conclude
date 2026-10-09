@@ -15,9 +15,9 @@ from unittest import mock
 
 import pytest
 
-from coverage import env, files
-from coverage.exceptions import ConfigError
-from coverage.files import (
+from test_conclude import env, files
+from test_conclude.exceptions import ConfigError
+from test_conclude.files import (
     GlobMatcher, ModuleMatcher, PathAliases, TreeMatcher, abs_file,
     actual_path, find_python_files, flat_rootname, globs_to_regex,
 )
@@ -27,7 +27,7 @@ from tests.helpers import os_sep
 
 
 class FilesTest(CoverageTest):
-    """Tests of coverage.files."""
+    """Tests of test_conclude.files."""
 
     def abs_path(self, p: str) -> str:
         """Return the absolute path for `p`."""
@@ -83,7 +83,7 @@ class FilesTest(CoverageTest):
     def test_relative_dir_for_root(self, curdir: str, sep: str) -> None:
         with mock.patch.object(files.os, 'curdir', new=curdir):
             with mock.patch.object(files.os, 'sep', new=sep):
-                with mock.patch('coverage.files.os.path.normcase', return_value=curdir):
+                with mock.patch('test_conclude.files.os.path.normcase', return_value=curdir):
                     files.set_relative_directory()
                     assert files.relative_directory() == curdir
 

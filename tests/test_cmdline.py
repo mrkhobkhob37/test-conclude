@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Test cmdline.py for coverage.py."""
+"""Test cmdline.py for test_conclude.py."""
 
 from __future__ import annotations
 
@@ -17,13 +17,13 @@ from typing import Any, Mapping
 
 import pytest
 
-import coverage
-import coverage.cmdline
-from coverage.control import DEFAULT_DATAFILE
-from coverage.config import CoverageConfig
-from coverage.exceptions import _ExceptionDuringRun
-from coverage.types import TConfigValueIn, TConfigValueOut
-from coverage.version import __url__
+import test_conclude
+import test_conclude.cmdline
+from test_conclude.control import DEFAULT_DATAFILE
+from test_conclude.config import CoverageConfig
+from test_conclude.exceptions import _ExceptionDuringRun
+from test_conclude.types import TConfigValueIn, TConfigValueOut
+from test_conclude.version import __url__
 
 from tests import testenv
 from tests.coveragetest import CoverageTest, OK, ERR, command_line
@@ -115,7 +115,7 @@ class BaseCmdLineTest(CoverageTest):
                 mk.config.set_option(name, value)
 
         patchers = [
-            mock.patch("coverage.cmdline."+name, getattr(mk, name))
+            mock.patch("test_conclude.cmdline."+name, getattr(mk, name))
             for name in self.MOCK_GLOBALS
         ]
         for patcher in patchers:
@@ -204,7 +204,7 @@ class BaseCmdLineTestTest(BaseCmdLineTest):
 
 
 class CmdLineTest(BaseCmdLineTest):
-    """Tests of the coverage.py command line."""
+    """Tests of the test_conclude.py command line."""
 
     def test_annotate(self) -> None:
         # coverage annotate [-d DIR] [-i] [--omit DIR,...] [FILE1 FILE2 ...]
@@ -350,8 +350,8 @@ class CmdLineTest(BaseCmdLineTest):
         assert re.search(fr"{s}site-packages{s}_pytest{s}", out)
         assert re.search(fr"{s}site-packages{s}pluggy{s}", out)
         assert re.search(fr"(?m)^\s+test_debug_premain : .*{s}tests{s}test_cmdline.py:\d+$", out)
-        assert re.search(fr"(?m)^\s+command_line : .*{s}coverage{s}cmdline.py:\d+$", out)
-        assert re.search(fr"(?m)^\s+do_debug : .*{s}coverage{s}cmdline.py:\d+$", out)
+        assert re.search(fr"(?m)^\s+command_line : .*{s}test_conclude{s}cmdline.py:\d+$", out)
+        assert re.search(fr"(?m)^\s+do_debug : .*{s}test_conclude{s}cmdline.py:\d+$", out)
         assert "do_debug : " in lines[-1]
 
     def test_erase(self) -> None:
@@ -631,7 +631,7 @@ class CmdLineTest(BaseCmdLineTest):
     def test_run(self) -> None:
         # coverage run [-p] [-L] [--timid] MODULE.py [ARG1 ARG2 ...]
 
-        # run calls coverage.erase first.
+        # run calls test_conclude.erase first.
         self.cmd_executes("run foo.py", """\
             cov = Coverage()
             runner = PyRunner(['foo.py'], as_module=False)
@@ -1078,12 +1078,12 @@ class CmdLineStdoutTest(BaseCmdLineTest):
 
 
 class CmdMainTest(CoverageTest):
-    """Tests of coverage.cmdline.main(), using mocking for isolation."""
+    """Tests of test_conclude.cmdline.main(), using mocking for isolation."""
 
     run_in_temp_dir = False
 
     class CoverageScriptStub:
-        """A stub for coverage.cmdline.CoverageScript, used by CmdMainTest."""
+        """A stub for test_conclude.cmdline.CoverageScript, used by CmdMainTest."""
 
         def command_line(self, argv: list[str]) -> int:
             """Stub for command_line, the arg determines what it will do."""
@@ -1104,17 +1104,17 @@ class CmdMainTest(CoverageTest):
 
     def setUp(self) -> None:
         super().setUp()
-        old_CoverageScript = coverage.cmdline.CoverageScript
-        coverage.cmdline.CoverageScript = self.CoverageScriptStub   # type: ignore
-        self.addCleanup(setattr, coverage.cmdline, 'CoverageScript', old_CoverageScript)
+        old_CoverageScript = test_conclude.cmdline.CoverageScript
+        test_conclude.cmdline.CoverageScript = self.CoverageScriptStub   # type: ignore
+        self.addCleanup(setattr, test_conclude.cmdline, 'CoverageScript', old_CoverageScript)
 
     def test_normal(self) -> None:
-        ret = coverage.cmdline.main(['hello'])
+        ret = test_conclude.cmdline.main(['hello'])
         assert ret == 0
         assert self.stdout() == "Hello, world!\n"
 
     def test_raise(self) -> None:
-        ret = coverage.cmdline.main(['raise'])
+        ret = test_conclude.cmdline.main(['raise'])
         assert ret == 1
         out, err = self.stdouterr()
         assert out == ""
@@ -1126,10 +1126,10 @@ class CmdMainTest(CoverageTest):
 
     def test_internalraise(self) -> None:
         with pytest.raises(ValueError, match="coverage is broken"):
-            coverage.cmdline.main(['internalraise'])
+            test_conclude.cmdline.main(['internalraise'])
 
     def test_exit(self) -> None:
-        ret = coverage.cmdline.main(['exit'])
+        ret = test_conclude.cmdline.main(['exit'])
         assert ret == 23
 
 
@@ -1215,7 +1215,7 @@ class FailUnderTest(CoverageTest):
         cov = CoverageReportingFake(*results)
         if fail_under is not None:
             cov.set_option("report:fail_under", fail_under)
-        with mock.patch("coverage.cmdline.Coverage", lambda *a,**kw: cov):
+        with mock.patch("test_conclude.cmdline.Coverage", lambda *a,**kw: cov):
             self.command_line(cmd, ret)
 
     @pytest.mark.parametrize("result, cmd, ret, msg", [
@@ -1228,6 +1228,6 @@ class FailUnderTest(CoverageTest):
     ])
     def test_fail_under_with_precision(self, result: float, cmd: str, ret: int, msg: str) -> None:
         cov = CoverageReportingFake(report_result=result)
-        with mock.patch("coverage.cmdline.Coverage", lambda *a,**kw: cov):
+        with mock.patch("test_conclude.cmdline.Coverage", lambda *a,**kw: cov):
             self.command_line(cmd, ret)
         assert self.stdout() == msg

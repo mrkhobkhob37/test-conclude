@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Base test case class for coverage.py testing."""
+"""Base test case class for test_conclude.py testing."""
 
 from __future__ import annotations
 
@@ -22,12 +22,12 @@ from typing import (
     Any, Collection, Iterable, Iterator, Mapping, Sequence,
 )
 
-import coverage
-from coverage import Coverage
-from coverage.cmdline import CoverageScript
-from coverage.data import CoverageData
-from coverage.misc import import_local_file
-from coverage.types import TArc, TLineNo
+import test_conclude
+from test_conclude import Coverage
+from test_conclude.cmdline import CoverageScript
+from test_conclude.data import CoverageData
+from test_conclude.misc import import_local_file
+from test_conclude.types import TArc, TLineNo
 
 from tests.helpers import arcs_to_arcz_repr, arcz_to_arcs, assert_count_equal
 from tests.helpers import nice_file, run_command
@@ -52,7 +52,7 @@ class CoverageTest(
     TempDirMixin,
     PytestBase,
 ):
-    """A base class for coverage.py test cases."""
+    """A base class for test_conclude.py test cases."""
 
     # Standard unittest setting: show me diffs even if they are very long.
     maxDiff = None
@@ -105,7 +105,7 @@ class CoverageTest(
             # Import the Python file, executing it.
             mod = import_local_file(modname, modfile)
         finally:                                # pragma: nested
-            # Stop coverage.py.
+            # Stop test_conclude.py.
             cov.stop()
         return mod
 
@@ -195,8 +195,8 @@ class CoverageTest(
         if arcs_unpredicted is None and arcz_unpredicted is not None:
             arcs_unpredicted = arcz_to_arcs(arcz_unpredicted)
 
-        # Start up coverage.py.
-        cov = coverage.Coverage(branch=True)
+        # Start up test_conclude.py.
+        cov = test_conclude.Coverage(branch=True)
         cov.erase()
         for exc in excludes or []:
             cov.exclude(exc)
@@ -269,7 +269,7 @@ class CoverageTest(
         file_tracers: Mapping[str, str] | None = None,
     ) -> CoverageData:
         """Write some data into a coverage data file."""
-        data = coverage.CoverageData(basename=basename, suffix=suffix)
+        data = test_conclude.CoverageData(basename=basename, suffix=suffix)
         assert lines is None or arcs is None
         if lines:
             data.add_lines(lines)
@@ -394,7 +394,7 @@ class CoverageTest(
     # their new command name to the tests. This is here for them to override,
     # for example:
     # https://salsa.debian.org/debian/pkg-python-coverage/-/blob/master/debian/patches/02.rename-public-programs.patch
-    coverage_command = "coverage"
+    coverage_command = "test-conclude"
 
     def run_command(self, cmd: str) -> str:
         """Run the command-line `cmd` in a sub-process.
@@ -426,7 +426,7 @@ class CoverageTest(
             Python interpreter.
 
         * "coverage" is replaced with the command name for the main
-            coverage.py program.
+            test_conclude.py program.
 
         Returns a pair: the process' exit status and its stdout/stderr text,
         which are also stored as `self.last_command_status` and
@@ -448,8 +448,8 @@ class CoverageTest(
             command_words = [os.path.basename(sys.executable)]
 
         elif command_name == "coverage":
-            # The invocation requests the coverage.py program.  Substitute the
-            # actual coverage.py main command name.
+            # The invocation requests the test_conclude.py program.  Substitute the
+            # actual test_conclude.py main command name.
             command_words = [self.coverage_command]
 
         else:
@@ -470,7 +470,7 @@ class CoverageTest(
         self.set_environ("PYTHONPATH", testmods + os.pathsep + zipfile)
 
     def working_root(self) -> str:
-        """Where is the root of the coverage.py working tree?"""
+        """Where is the root of the test_conclude.py working tree?"""
         return os.path.dirname(nice_file(__file__, ".."))
 
     def report_from_command(self, cmd: str) -> str:

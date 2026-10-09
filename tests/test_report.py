@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Test text-based summary reporting for coverage.py"""
+"""Test text-based summary reporting for test_conclude.py"""
 
 from __future__ import annotations
 
@@ -16,21 +16,21 @@ import re
 
 import pytest
 
-import coverage
-from coverage import env
-from coverage.control import Coverage
-from coverage.data import CoverageData
-from coverage.exceptions import ConfigError, NoDataError, NotPython
-from coverage.files import abs_file
-from coverage.report import SummaryReporter
-from coverage.types import TConfigValueIn
+import test_conclude
+from test_conclude import env
+from test_conclude.control import Coverage
+from test_conclude.data import CoverageData
+from test_conclude.exceptions import ConfigError, NoDataError, NotPython
+from test_conclude.files import abs_file
+from test_conclude.report import SummaryReporter
+from test_conclude.types import TConfigValueIn
 
 from tests.coveragetest import CoverageTest, TESTS_DIR, UsingModulesMixin
 from tests.helpers import assert_coverage_warnings
 
 
 class SummaryTest(UsingModulesMixin, CoverageTest):
-    """Tests of the text summary reporting for coverage.py."""
+    """Tests of the text summary reporting for test_conclude.py."""
 
     def make_mycode(self) -> None:
         """Make the mycode.py file when needed."""
@@ -43,7 +43,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
 
     def test_report(self) -> None:
         self.make_mycode()
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "mycode")
         assert self.stdout() == 'done\n'
         report = self.get_report(cov)
@@ -56,7 +56,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
         # ------------------------------------------------------------------
         # TOTAL                                              8      0   100%
 
-        assert "/coverage/__init__/" not in report
+        assert "/test_conclude/__init__/" not in report
         assert "/tests/modules/covmod1.py " in report
         assert "/tests/zipmods.zip/covmodzip1.py " in report
         assert "mycode.py " in report
@@ -65,7 +65,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
     def test_report_just_one(self) -> None:
         # Try reporting just one module
         self.make_mycode()
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "mycode")
         report = self.get_report(cov, morfs=["mycode.py"])
 
@@ -75,7 +75,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
         # -------------------------------
         # TOTAL           4      0   100%
         assert self.line_count(report) == 5
-        assert "/coverage/" not in report
+        assert "/test_conclude/" not in report
         assert "/tests/modules/covmod1.py " not in report
         assert "/tests/zipmods.zip/covmodzip1.py " not in report
         assert "mycode.py " in report
@@ -96,7 +96,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
         # TOTAL           4      0   100%
 
         assert self.line_count(report) == 5
-        assert "/coverage/" not in report
+        assert "/test_conclude/" not in report
         assert "/tests/modules/covmod1.py " not in report
         assert "/tests/zipmods.zip/covmodzip1.py " not in report
         assert "mycode.py " in report
@@ -105,7 +105,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
     def test_report_omitting(self) -> None:
         # Try reporting while omitting some modules
         self.make_mycode()
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "mycode")
         report = self.get_report(cov, omit=[f"{TESTS_DIR}/*", "*/site-packages/*"])
 
@@ -116,7 +116,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
         # TOTAL           4      0   100%
 
         assert self.line_count(report) == 5
-        assert "/coverage/" not in report
+        assert "/test_conclude/" not in report
         assert "/tests/modules/covmod1.py " not in report
         assert "/tests/zipmods.zip/covmodzip1.py " not in report
         assert "mycode.py " in report
@@ -125,7 +125,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
     def test_report_including(self) -> None:
         # Try reporting while including some modules
         self.make_mycode()
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "mycode")
         report = self.get_report(cov, include=["mycode*"])
 
@@ -136,7 +136,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
         # TOTAL           4      0   100%
 
         assert self.line_count(report) == 5
-        assert "/coverage/" not in report
+        assert "/test_conclude/" not in report
         assert "/tests/modules/covmod1.py " not in report
         assert "/tests/zipmods.zip/covmodzip1.py " not in report
         assert "mycode.py " in report
@@ -156,7 +156,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
             """)
         self.make_file("submodule/mycode.py", "import mycode")
 
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "submodule/mycode")
         report = self.get_report(cov, include="submodule/mycode.py")
 
@@ -178,7 +178,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
         self.make_file("submodule/mycode.py", "import nested.submodule.mycode")
         self.make_file("nested/submodule/mycode.py", "import mycode")
 
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "submodule/mycode")
         report = self.get_report(cov, include="*/submodule/mycode.py")
 
@@ -229,7 +229,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
             include = mod/*,tests/*
             """)
         # It should be OK to use that configuration.
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         with self.assert_warnings(cov, []):
             with cov.collect():
                 pass
@@ -263,7 +263,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
                 return x
             branch(1)
             """)
-        cov = coverage.Coverage(source=["."], branch=True)
+        cov = test_conclude.Coverage(source=["."], branch=True)
         self.start_import_stop(cov, "mybranch")
         assert self.stdout() == 'x\n'
         report = self.get_report(cov)
@@ -294,7 +294,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
                 return x
             missing(0, 1)
             """)
-        cov = coverage.Coverage(source=["."])
+        cov = test_conclude.Coverage(source=["."])
         self.start_import_stop(cov, "mymissing")
         assert self.stdout() == 'y\nz\n'
         report = self.get_report(cov, show_missing=True)
@@ -319,7 +319,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
                     print("y")
             branch(1, 1)
             """)
-        cov = coverage.Coverage(branch=True)
+        cov = test_conclude.Coverage(branch=True)
         self.start_import_stop(cov, "mybranch")
         assert self.stdout() == 'x\ny\n'
         report = self.get_report(cov, show_missing=True)
@@ -351,7 +351,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
                 return x
             branch(1, 1, 0)
             """)
-        cov = coverage.Coverage(branch=True)
+        cov = test_conclude.Coverage(branch=True)
         self.start_import_stop(cov, "main")
         assert self.stdout() == 'x\ny\n'
         report_lines = self.get_report(cov, squeeze=False, show_missing=True).splitlines()
@@ -419,7 +419,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
                 pass
             foo()
             """)
-        cov = coverage.Coverage(branch=True)
+        cov = test_conclude.Coverage(branch=True)
         self.start_import_stop(cov, "main")
         assert self.stdout() == "n\nz\n"
         report = self.get_report(cov, skip_covered=True)
@@ -459,7 +459,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
             def does_not_appear_in_this_film(ni):
                 print("Ni!")
             """)
-        cov = coverage.Coverage(branch=True)
+        cov = test_conclude.Coverage(branch=True)
         self.start_import_stop(cov, "main")
         assert self.stdout() == "n\nz\n"
         report = self.get_report(cov, skip_covered=True)
@@ -486,7 +486,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
                 pass
             foo()
             """)
-        cov = coverage.Coverage(source=["."], branch=True)
+        cov = test_conclude.Coverage(source=["."], branch=True)
         self.start_import_stop(cov, "main")
         assert self.stdout() == ""
         report = self.get_report(cov, skip_covered=True)
@@ -531,7 +531,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
                 pass
             foo()
             """)
-        cov = coverage.Coverage(source=["."], branch=True)
+        cov = test_conclude.Coverage(source=["."], branch=True)
         self.start_import_stop(cov, "long_______________filename")
         assert self.stdout() == ""
         report = self.get_report(cov, squeeze=False, skip_covered=True)
@@ -549,7 +549,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
         assert squeezed[4] == "1 file skipped due to complete coverage."
 
     def test_report_skip_covered_no_data(self) -> None:
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         with pytest.raises(NoDataError, match="No data to report."):
             self.get_report(cov, skip_covered=True)
@@ -564,7 +564,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
             normal()
             """)
         self.make_file("submodule/__init__.py", "")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "main")
         assert self.stdout() == "z\n"
         report = self.get_report(cov, skip_empty=True)
@@ -585,7 +585,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
 
     def test_report_skip_empty_no_data(self) -> None:
         self.make_file("__init__.py", "")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "__init__")
         assert self.stdout() == ""
         report = self.get_report(cov, skip_empty=True)
@@ -626,7 +626,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
                 pass
             foo()
             """)
-        cov = coverage.Coverage(branch=True)
+        cov = test_conclude.Coverage(branch=True)
         self.start_import_stop(cov, "main")
         assert self.stdout() == "n\nz\n"
         report = self.get_report(cov, squeeze=False)
@@ -652,7 +652,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
                     print("n")
             """)
         self.make_file("empty.py", "")
-        cov = coverage.Coverage(source=["."])
+        cov = test_conclude.Coverage(source=["."])
         self.start_import_stop(cov, "empty")
         report = self.get_report(cov, precision=6, squeeze=False)
 
@@ -674,7 +674,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
 
         self.make_data_file(lines={"mycode.py": [1]})
         self.make_file("mycode.py", "This isn't python at all!")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         msg = r"Couldn't parse '.*[/\\]mycode.py' as Python source: '.*' at line 1"
         with pytest.raises(NotPython, match=msg):
@@ -691,7 +691,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
             "-----------------------------------\n" +
             "TOTAL               1      0   100%\n"
         )
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         output = self.get_report(cov, squeeze=False)
         assert output == report_expected
@@ -702,7 +702,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
 
         self.make_data_file(lines={"accented\xe2.py": [1]})
         self.make_file("accented\xe2.py", "This isn't python at all!")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         msg = r"Couldn't parse '.*[/\\]accented\xe2.py' as Python source: '.*' at line 1"
         with pytest.raises(NotPython, match=msg):
@@ -714,7 +714,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
         # though we still get a warning.
         self.make_file("mycode.py", "This isn't python at all!")
         self.make_data_file(lines={"mycode.py": [1]})
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         with pytest.raises(NoDataError, match="No data to report."):
             with pytest.warns(Warning) as warns:
@@ -731,7 +731,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
         # Pretend to run an html file.
         self.make_file("mycode.html", "<h1>This isn't python at all!</h1>")
         self.make_data_file(lines={"mycode.html": [1]})
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         with pytest.raises(NoDataError, match="No data to report."):
             self.get_report(cov, morfs=["mycode.html"])
@@ -748,7 +748,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
             print(f"xxx: {a} {b} {c} {d}")
             """)
         self.make_data_file(lines={abs_file("xxx"): [2, 3, 4, 5, 7, 8]})
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         report = self.get_report(cov)
         assert self.last_line_squeezed(report) == "TOTAL 7 1 86%"
@@ -781,14 +781,14 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
         self.make_file("main.py", """\
             print("y")
             """)
-        cov = coverage.Coverage(branch=True, source=["."])
+        cov = test_conclude.Coverage(branch=True, source=["."])
         self.start_import_stop(cov, "main")
         report = self.get_report(cov).splitlines()
         assert "mybranch.py 5 5 2 0 0%" in report
 
     def run_TheCode_and_report_it(self) -> str:
         """A helper for the next few tests."""
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "TheCode")
         return self.get_report(cov)
 
@@ -818,7 +818,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
         self.make_file("mod.pyw", """\
             print("In mod.pyw")
             """)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         # start_import_stop can't import the .pyw file, so use the long form.
         with cov.collect():
             import start    # pylint: disable=import-error, unused-import
@@ -838,7 +838,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
         py_compile.compile("mod.py")
 
         # Run the program.
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "main")
 
         report_lines = self.get_report(cov).splitlines()
@@ -864,7 +864,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
         os.rename(pycs[0], "mod.pyc")
 
         # Run the program.
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "main")
 
         # Put back the missing Python file.
@@ -875,7 +875,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
     def test_empty_files(self) -> None:
         # Shows that empty files like __init__.py are listed as having zero
         # statements, not one statement.
-        cov = coverage.Coverage(branch=True)
+        cov = test_conclude.Coverage(branch=True)
         with cov.collect():
             import usepkgs  # pylint: disable=import-error, unused-import
         report = self.get_report(cov)
@@ -906,7 +906,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
                 return x
             missing(0, 1)
             """)
-        cov = coverage.Coverage(source=["."])
+        cov = test_conclude.Coverage(source=["."])
         self.start_import_stop(cov, "mymissing")
         assert self.stdout() == 'y\nz\n'
         report = self.get_report(cov, squeeze=False, output_format="markdown", show_missing=True)
@@ -933,7 +933,7 @@ class SummaryTest(UsingModulesMixin, CoverageTest):
 
             print(Mine().thing)
             """)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "bug1524")
         assert self.stdout() == "17\n"
         report = self.get_report(cov)
@@ -956,7 +956,7 @@ class ReportingReturnValueTest(CoverageTest):
             g = 7
             """)
 
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "doit")
         return cov
 

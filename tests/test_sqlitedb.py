@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Tests for coverage.sqlitedb"""
+"""Tests for test_conclude.sqlitedb"""
 
 from __future__ import annotations
 
@@ -10,9 +10,9 @@ from unittest import mock
 
 import pytest
 
-import coverage.sqlitedb
-from coverage.exceptions import DataError
-from coverage.sqlitedb import SqliteDb
+import test_conclude.sqlitedb
+from test_conclude.exceptions import DataError
+from test_conclude.sqlitedb import SqliteDb
 
 from tests.coveragetest import CoverageTest
 from tests.helpers import DebugControlString, FailingProxy
@@ -79,7 +79,7 @@ class SqliteDbTest(CoverageTest):
         def fake_failing_open(filename: str, mode: str) -> NoReturn:
             assert (filename, mode) == ("bad.db", "rb")
             raise RuntimeError("No you can't!")
-        with mock.patch.object(coverage.sqlitedb, "open", fake_failing_open):
+        with mock.patch.object(test_conclude.sqlitedb, "open", fake_failing_open):
             msg = "Couldn't use data file 'bad.db': file is not a database"
             with pytest.raises(DataError, match=msg):
                 with SqliteDb("bad.db", DebugControlString(options=["sql"])):

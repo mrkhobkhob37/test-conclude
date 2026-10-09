@@ -7,8 +7,8 @@ from __future__ import annotations
 
 import sys
 
-from coverage.plugin import FileReporter
-from coverage.python import PythonFileReporter
+from test_conclude.plugin import FileReporter
+from test_conclude.python import PythonFileReporter
 
 from tests.coveragetest import CoverageTest, UsingModulesMixin
 from tests.helpers import os_sep

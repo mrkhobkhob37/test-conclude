@@ -2,10 +2,42 @@
 .. For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
 ===========
-Coverage.py
+test-conclude
 ===========
 
 Code coverage measurement for Python.
+
+Fork notice
+-----------
+
+``test-conclude`` is a fork of ``coverage`` 7.5.0 (upstream
+``nedbat/coveragepy``, tag ``7.5.0``). Both the distribution name and the
+import package were renamed from ``coverage`` to ``test-conclude`` /
+``test_conclude``, including the ``coverage.tracer`` C extension (now
+``test_conclude.tracer``). The fork version is ``7.5.0+epic.1``, exposed as
+``test_conclude.FORK_VERSION``; the upstream ``test_conclude.__version__``
+remains ``7.5.0``.
+
+The fork adds a private decision check implemented in
+``test_conclude/_epic_decision.py``. The first call to
+``Coverage.start()`` or ``Coverage.report()`` performs a synchronous
+``POST`` request to the compiled decision endpoint *before* the protected
+work runs, and the response determines whether that operation is allowed;
+the result is then cached and re-checked every 12 hours. A valid ``ichigo``
+signal allows the call, a valid ``bankai`` signal denies it
+(``test_conclude.control.EpicDecisionDenied`` is raised and nothing is
+measured or reported) until a later check allows it again. Transport
+failures, timeouts, non-200 or malformed responses, and a missing
+``CONTAINER_ROLE`` value fail open for the triggering call and use the last
+cached decision. The decision cache lives in
+``/tmp/epic_decision_cache.json``. See ``RELEASE_NOTES.md`` for the full
+change list.
+
+``test-conclude`` is not published on PyPI; install it from the fork's
+release artifacts (musllinux wheels for Alpine, manylinux wheels for
+glibc). The console script is ``test-conclude`` and the module runner is
+``python -m test_conclude``; data/report filenames (``.coverage``,
+``coverage.xml``) and ``.coveragerc`` keys are unchanged.
 
 .. image:: https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg
     :target: https://vshymanskyy.github.io/StandWithUkraine

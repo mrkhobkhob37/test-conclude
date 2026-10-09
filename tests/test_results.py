@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Tests for coverage.py's results analysis."""
+"""Tests for test_conclude.py's results analysis."""
 
 from __future__ import annotations
 
@@ -11,15 +11,15 @@ from typing import Iterable, cast
 
 import pytest
 
-from coverage.exceptions import ConfigError
-from coverage.results import Numbers, display_covered, format_lines, should_fail_under
-from coverage.types import TLineNo
+from test_conclude.exceptions import ConfigError
+from test_conclude.results import Numbers, display_covered, format_lines, should_fail_under
+from test_conclude.types import TLineNo
 
 from tests.coveragetest import CoverageTest
 
 
 class NumbersTest(CoverageTest):
-    """Tests for coverage.py's numeric measurement summaries."""
+    """Tests for test_conclude.py's numeric measurement summaries."""
 
     run_in_temp_dir = False
 

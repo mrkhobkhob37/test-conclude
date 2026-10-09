@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Tests for coverage.py's improved tokenizer."""
+"""Tests for test_conclude.py's improved tokenizer."""
 
 from __future__ import annotations
 
@@ -13,9 +13,9 @@ import warnings
 
 import pytest
 
-from coverage import env
-from coverage.phystokens import source_token_lines, source_encoding
-from coverage.python import get_python_source
+from test_conclude import env
+from test_conclude.phystokens import source_token_lines, source_encoding
+from test_conclude.python import get_python_source
 
 from tests.coveragetest import CoverageTest, TESTS_DIR
 
@@ -57,7 +57,7 @@ print( "Message 2" )
 """
 
 class PhysTokensTest(CoverageTest):
-    """Tests for coverage.py's improved tokenizer."""
+    """Tests for test_conclude.py's improved tokenizer."""
 
     run_in_temp_dir = False
 

@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Test the config file handling for coverage.py"""
+"""Test the config file handling for test_conclude.py"""
 
 from __future__ import annotations
 
@@ -9,12 +9,12 @@ from unittest import mock
 
 import pytest
 
-import coverage
-from coverage import Coverage, env
-from coverage.config import HandyConfigParser
-from coverage.exceptions import ConfigError, CoverageWarning
-from coverage.tomlconfig import TomlConfigParser
-from coverage.types import FilePathClasses, FilePathType
+import test_conclude
+from test_conclude import Coverage, env
+from test_conclude.config import HandyConfigParser
+from test_conclude.exceptions import ConfigError, CoverageWarning
+from test_conclude.tomlconfig import TomlConfigParser
+from test_conclude.types import FilePathClasses, FilePathType
 
 from tests.coveragetest import CoverageTest, UsingModulesMixin
 
@@ -24,14 +24,14 @@ class ConfigTest(CoverageTest):
 
     def test_default_config(self) -> None:
         # Just constructing a coverage() object gets the right defaults.
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         assert not cov.config.timid
         assert not cov.config.branch
         assert cov.config.data_file == ".coverage"
 
     def test_arguments(self) -> None:
         # Arguments to the constructor are applied to the configuration.
-        cov = coverage.Coverage(timid=True, data_file="fooey.dat", concurrency="multiprocessing")
+        cov = test_conclude.Coverage(timid=True, data_file="fooey.dat", concurrency="multiprocessing")
         assert cov.config.timid
         assert not cov.config.branch
         assert cov.config.data_file == "fooey.dat"
@@ -45,7 +45,7 @@ class ConfigTest(CoverageTest):
             timid =         True
             data_file =     .hello_kitty.data
             """)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         assert cov.config.timid
         assert not cov.config.branch
         assert cov.config.data_file == ".hello_kitty.data"
@@ -59,7 +59,7 @@ class ConfigTest(CoverageTest):
             ; I wouldn't really use this as a data file...
             data_file = delete.me
             """)
-        cov = coverage.Coverage(config_file=file_class("my_cov.ini"))
+        cov = test_conclude.Coverage(config_file=file_class("my_cov.ini"))
         assert cov.config.timid
         assert not cov.config.branch
         assert cov.config.data_file == "delete.me"
@@ -83,7 +83,7 @@ class ConfigTest(CoverageTest):
             [tool.coverage.plugins.a_plugin]
             hello = "world"
             """)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         assert cov.config.timid
         assert not cov.config.branch
         assert cov.config.concurrency == ["a", "b"]
@@ -101,7 +101,7 @@ class ConfigTest(CoverageTest):
             [tool.coverage.report]
             fail_under = 90
             """)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         assert cov.config.fail_under == 90
         assert isinstance(cov.config.fail_under, float)
 
@@ -112,7 +112,7 @@ class ConfigTest(CoverageTest):
             timid = True
             data_file = delete.me
             """)
-        cov = coverage.Coverage(config_file=False)
+        cov = test_conclude.Coverage(config_file=False)
         assert not cov.config.timid
         assert not cov.config.branch
         assert cov.config.data_file == ".coverage"
@@ -124,7 +124,7 @@ class ConfigTest(CoverageTest):
             timid = True
             data_file = weirdo.file
             """)
-        cov = coverage.Coverage(timid=False, data_file=".mycov")
+        cov = test_conclude.Coverage(timid=False, data_file=".mycov")
         assert not cov.config.timid
         assert not cov.config.branch
         assert cov.config.data_file == ".mycov"
@@ -137,10 +137,10 @@ class ConfigTest(CoverageTest):
             data_file = weirdo.file
             """)
         self.set_environ("COVERAGE_FILE", "fromenv.dat")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         assert cov.config.data_file == "fromenv.dat"
         # But the constructor arguments override the environment variable.
-        cov = coverage.Coverage(data_file="fromarg.dat")
+        cov = test_conclude.Coverage(data_file="fromarg.dat")
         assert cov.config.data_file == "fromarg.dat"
 
     def test_debug_from_environment(self) -> None:
@@ -149,7 +149,7 @@ class ConfigTest(CoverageTest):
             debug = dataio, pids
             """)
         self.set_environ("COVERAGE_DEBUG", "callers, fooey")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         assert cov.config.debug == ["dataio", "pids", "callers", "fooey"]
 
     def test_rcfile_from_environment(self) -> None:
@@ -158,14 +158,14 @@ class ConfigTest(CoverageTest):
             data_file = overthere.dat
             """)
         self.set_environ("COVERAGE_RCFILE", "here.ini")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         assert cov.config.data_file == "overthere.dat"
 
     def test_missing_rcfile_from_environment(self) -> None:
         self.set_environ("COVERAGE_RCFILE", "nowhere.ini")
         msg = "Couldn't read 'nowhere.ini' as a config file"
         with pytest.raises(ConfigError, match=msg):
-            coverage.Coverage()
+            test_conclude.Coverage()
 
     @pytest.mark.parametrize("bad_config, msg", [
         ("[run]\ntimid = maybe?\n", r"maybe[?]"),
@@ -186,7 +186,7 @@ class ConfigTest(CoverageTest):
         # Im-parsable values raise ConfigError, with details.
         self.make_file(".coveragerc", bad_config)
         with pytest.raises(ConfigError, match=msg):
-            coverage.Coverage()
+            test_conclude.Coverage()
 
     @pytest.mark.parametrize("bad_config, msg", [
         ("[tool.coverage.run]\ntimid = \"maybe?\"\n", r"maybe[?]"),
@@ -209,7 +209,7 @@ class ConfigTest(CoverageTest):
         # Im-parsable values raise ConfigError, with details.
         self.make_file("pyproject.toml", bad_config)
         with pytest.raises(ConfigError, match=msg):
-            coverage.Coverage()
+            test_conclude.Coverage()
 
     def test_environment_vars_in_config(self) -> None:
         # Config files can have $envvars in them.
@@ -228,7 +228,7 @@ class ConfigTest(CoverageTest):
         self.set_environ("DATA_FILE", "hello-world")
         self.set_environ("THING", "ZZZ")
         self.set_environ("OKAY", "yes")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         assert cov.config.data_file == "hello-world.fooey"
         assert cov.config.branch is True
         assert cov.config.exclude_list == ["the_$one", "anotherZZZ", "xZZZy", "xy", "huh${X}what"]
@@ -260,7 +260,7 @@ class ConfigTest(CoverageTest):
         self.set_environ("DATA_FILE", "hello-world")
         self.set_environ("THING", "ZZZ")
         self.set_environ("OTHER", "hi\\zebra")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         assert cov.config.branch is True
         assert cov.config.precision == 3
         assert cov.config.data_file == "hello-world.fooey"
@@ -295,8 +295,8 @@ class ConfigTest(CoverageTest):
             s = s.replace("~joe/", "/Users/joe/")
             return s
 
-        with mock.patch.object(coverage.config.os.path, 'expanduser', new=expanduser):
-            cov = coverage.Coverage()
+        with mock.patch.object(test_conclude.config.os.path, 'expanduser', new=expanduser):
+            cov = test_conclude.Coverage()
         assert cov.config.data_file == "/Users/me/data.file"
         assert cov.config.html_dir == "/Users/joe/html_dir"
         assert cov.config.xml_output == "/Users/me/somewhere/xml.out"
@@ -334,8 +334,8 @@ class ConfigTest(CoverageTest):
             s = s.replace("~joe/", "/Users/joe/")
             return s
 
-        with mock.patch.object(coverage.config.os.path, 'expanduser', new=expanduser):
-            cov = coverage.Coverage()
+        with mock.patch.object(test_conclude.config.os.path, 'expanduser', new=expanduser):
+            cov = test_conclude.Coverage()
         assert cov.config.data_file == "/Users/me/data.file"
         assert cov.config.html_dir == "/Users/joe/html_dir"
         assert cov.config.xml_output == "/Users/me/somewhere/xml.out"
@@ -344,7 +344,7 @@ class ConfigTest(CoverageTest):
 
     def test_tweaks_after_constructor(self) -> None:
         # set_option can be used after construction to affect the config.
-        cov = coverage.Coverage(timid=True, data_file="fooey.dat")
+        cov = test_conclude.Coverage(timid=True, data_file="fooey.dat")
         cov.set_option("run:timid", False)
 
         assert not cov.config.timid
@@ -370,7 +370,7 @@ class ConfigTest(CoverageTest):
             "first": ["/first/1", "/first/2"],
             "second": ["/second/a", "/second/b"],
         }
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         paths = cov.get_option("paths")
         assert paths == old_paths
 
@@ -383,7 +383,7 @@ class ConfigTest(CoverageTest):
 
     def test_tweak_error_checking(self) -> None:
         # Trying to set an unknown config value raises an error.
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         with pytest.raises(ConfigError, match="No such option: 'run:xyzzy'"):
             cov.set_option("run:xyzzy", 12)
         with pytest.raises(ConfigError, match="No such option: 'xyzzy:foo'"):
@@ -395,7 +395,7 @@ class ConfigTest(CoverageTest):
 
     def test_tweak_plugin_options(self) -> None:
         # Plugin options have a more flexible syntax.
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.set_option("run:plugins", ["fooey.plugin", "xyzzy.coverage.plugin"])
         cov.set_option("fooey.plugin:xyzzy", 17)
         cov.set_option("xyzzy.coverage.plugin:plugh", ["a", "b"])
@@ -414,7 +414,7 @@ class ConfigTest(CoverageTest):
             """)
         msg = r"Unrecognized option '\[run\] xyzzy=' in config file .coveragerc"
         with pytest.warns(CoverageWarning, match=msg):
-            _ = coverage.Coverage()
+            _ = test_conclude.Coverage()
 
     def test_unknown_option_toml(self) -> None:
         self.make_file("pyproject.toml", """\
@@ -423,7 +423,7 @@ class ConfigTest(CoverageTest):
             """)
         msg = r"Unrecognized option '\[tool.coverage.run\] xyzzy=' in config file pyproject.toml"
         with pytest.warns(CoverageWarning, match=msg):
-            _ = coverage.Coverage()
+            _ = test_conclude.Coverage()
 
     def test_misplaced_option(self) -> None:
         self.make_file(".coveragerc", """\
@@ -432,7 +432,7 @@ class ConfigTest(CoverageTest):
             """)
         msg = r"Unrecognized option '\[report\] branch=' in config file .coveragerc"
         with pytest.warns(CoverageWarning, match=msg):
-            _ = coverage.Coverage()
+            _ = test_conclude.Coverage()
 
     def test_unknown_option_in_other_ini_file(self) -> None:
         self.make_file("setup.cfg", """\
@@ -441,7 +441,7 @@ class ConfigTest(CoverageTest):
             """)
         msg = r"Unrecognized option '\[coverage:run\] huh=' in config file setup.cfg"
         with pytest.warns(CoverageWarning, match=msg):
-            _ = coverage.Coverage()
+            _ = test_conclude.Coverage()
 
     def test_exceptions_from_missing_things(self) -> None:
         self.make_file("config.ini", """\
@@ -460,9 +460,9 @@ class ConfigTest(CoverageTest):
             [tool.coverage.report]
             exclude_also = ["foobar", "raise .*Error"]
             """)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
 
-        expected = coverage.config.DEFAULT_EXCLUDE + ["foobar", "raise .*Error"]
+        expected = test_conclude.config.DEFAULT_EXCLUDE + ["foobar", "raise .*Error"]
         assert cov.config.exclude_list == expected
 
 
@@ -472,7 +472,7 @@ class ConfigFileTest(UsingModulesMixin, CoverageTest):
     # This sample file tries to use lots of variation of syntax...
     # The {section} placeholder lets us nest these settings in another file.
     LOTSA_SETTINGS = """\
-        # This is a settings file for coverage.py
+        # This is a settings file for test_conclude.py
         [{section}run]
         timid = yes
         data_file = something_or_other.dat
@@ -616,14 +616,14 @@ class ConfigFileTest(UsingModulesMixin, CoverageTest):
 
     def test_config_file_settings(self) -> None:
         self.make_file(".coveragerc", self.LOTSA_SETTINGS.format(section=""))
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.assert_config_settings_are_correct(cov)
 
     def check_config_file_settings_in_other_file(self, fname: str, contents: str) -> None:
         """Check config will be read from another file, with prefixed sections."""
         nested = self.LOTSA_SETTINGS.format(section="coverage:")
         fname = self.make_file(fname, nested + "\n" + contents)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.assert_config_settings_are_correct(cov)
 
     def test_config_file_settings_in_setupcfg(self) -> None:
@@ -636,7 +636,7 @@ class ConfigFileTest(UsingModulesMixin, CoverageTest):
         """Check that config `fname` is read if .coveragerc is missing, but specified."""
         nested = self.LOTSA_SETTINGS.format(section="coverage:")
         self.make_file(fname, nested + "\n" + contents)
-        cov = coverage.Coverage(config_file=".coveragerc")
+        cov = test_conclude.Coverage(config_file=".coveragerc")
         self.assert_config_settings_are_correct(cov)
 
     def test_config_file_settings_in_setupcfg_if_coveragerc_specified(self) -> None:
@@ -656,7 +656,7 @@ class ConfigFileTest(UsingModulesMixin, CoverageTest):
             omit = bar
             branch = true
             """)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         assert cov.config.run_include == ["foo"]
         assert cov.config.run_omit == []
         assert cov.config.branch is False
@@ -674,7 +674,7 @@ class ConfigFileTest(UsingModulesMixin, CoverageTest):
             omit = bar
             branch = true
             """)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         assert cov.config.run_omit == []
         assert cov.config.branch is False
 
@@ -690,14 +690,14 @@ class ConfigFileTest(UsingModulesMixin, CoverageTest):
         nested = self.LOTSA_SETTINGS.format(section="coverage:")
         self.make_file("tox.ini", self.TOX_INI + "\n" + nested)
         self.make_file("setup.cfg", self.SETUP_CFG)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.assert_config_settings_are_correct(cov)
 
     def test_read_prefixed_sections_from_explicit_file(self) -> None:
         # You can point to a tox.ini, and it will find [coverage:run] sections
         nested = self.LOTSA_SETTINGS.format(section="coverage:")
         self.make_file("tox.ini", self.TOX_INI + "\n" + nested)
-        cov = coverage.Coverage(config_file="tox.ini")
+        cov = test_conclude.Coverage(config_file="tox.ini")
         self.assert_config_settings_are_correct(cov)
 
     def test_non_ascii(self) -> None:
@@ -711,7 +711,7 @@ class ConfigFileTest(UsingModulesMixin, CoverageTest):
             title = tabblo & «ταБЬℓσ» # numbers
             """)
         self.set_environ("TOX_ENVNAME", "weirdo")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
 
         assert cov.config.exclude_list == ["first", "✘weirdo", "third"]
         assert cov.config.html_title == "tabblo & «ταБЬℓσ» # numbers"
@@ -722,29 +722,29 @@ class ConfigFileTest(UsingModulesMixin, CoverageTest):
         # to not be readable.
         msg = f"Couldn't read {bad_file!r} as a config file"
         with pytest.raises(ConfigError, match=msg):
-            coverage.Coverage(config_file=bad_file)
+            test_conclude.Coverage(config_file=bad_file)
 
     def test_nocoveragerc_file_when_specified(self) -> None:
-        cov = coverage.Coverage(config_file=".coveragerc")
+        cov = test_conclude.Coverage(config_file=".coveragerc")
         assert not cov.config.timid
         assert not cov.config.branch
         assert cov.config.data_file == ".coverage"
 
     def test_no_toml_installed_no_toml(self) -> None:
         # Can't read a toml file that doesn't exist.
-        with mock.patch.object(coverage.tomlconfig, "has_tomllib", False):
+        with mock.patch.object(test_conclude.tomlconfig, "has_tomllib", False):
             msg = "Couldn't read 'cov.toml' as a config file"
             with pytest.raises(ConfigError, match=msg):
-                coverage.Coverage(config_file="cov.toml")
+                test_conclude.Coverage(config_file="cov.toml")
 
     @pytest.mark.skipif(env.PYVERSION >= (3, 11), reason="Python 3.11 has toml in stdlib")
     def test_no_toml_installed_explicit_toml(self) -> None:
         # Can't specify a toml config file if toml isn't installed.
         self.make_file("cov.toml", "# A toml file!")
-        with mock.patch.object(coverage.tomlconfig, "has_tomllib", False):
+        with mock.patch.object(test_conclude.tomlconfig, "has_tomllib", False):
             msg = "Can't read 'cov.toml' without TOML support"
             with pytest.raises(ConfigError, match=msg):
-                coverage.Coverage(config_file="cov.toml")
+                test_conclude.Coverage(config_file="cov.toml")
 
     @pytest.mark.skipif(env.PYVERSION >= (3, 11), reason="Python 3.11 has toml in stdlib")
     def test_no_toml_installed_pyproject_toml(self) -> None:
@@ -754,10 +754,10 @@ class ConfigFileTest(UsingModulesMixin, CoverageTest):
             [tool.coverage.run]
             xyzzy = 17
             """)
-        with mock.patch.object(coverage.tomlconfig, "has_tomllib", False):
+        with mock.patch.object(test_conclude.tomlconfig, "has_tomllib", False):
             msg = "Can't read 'pyproject.toml' without TOML support"
             with pytest.raises(ConfigError, match=msg):
-                coverage.Coverage()
+                test_conclude.Coverage()
 
     @pytest.mark.skipif(env.PYVERSION >= (3, 11), reason="Python 3.11 has toml in stdlib")
     def test_no_toml_installed_pyproject_toml_shorter_syntax(self) -> None:
@@ -767,10 +767,10 @@ class ConfigFileTest(UsingModulesMixin, CoverageTest):
             [tool.coverage]
             run.parallel = true
             """)
-        with mock.patch.object(coverage.tomlconfig, "has_tomllib", False):
+        with mock.patch.object(test_conclude.tomlconfig, "has_tomllib", False):
             msg = "Can't read 'pyproject.toml' without TOML support"
             with pytest.raises(ConfigError, match=msg):
-                coverage.Coverage()
+                test_conclude.Coverage()
 
     @pytest.mark.skipif(env.PYVERSION >= (3, 11), reason="Python 3.11 has toml in stdlib")
     def test_no_toml_installed_pyproject_no_coverage(self) -> None:
@@ -780,8 +780,8 @@ class ConfigFileTest(UsingModulesMixin, CoverageTest):
             [tool.something]
             xyzzy = 17
             """)
-        with mock.patch.object(coverage.tomlconfig, "has_tomllib", False):
-            cov = coverage.Coverage()
+        with mock.patch.object(test_conclude.tomlconfig, "has_tomllib", False):
+            cov = test_conclude.Coverage()
             # We get default settings:
             assert not cov.config.timid
             assert not cov.config.branch

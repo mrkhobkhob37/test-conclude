@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Oddball cases for testing coverage.py"""
+"""Oddball cases for testing test_conclude.py"""
 
 from __future__ import annotations
 
@@ -12,11 +12,11 @@ import sys
 from flaky import flaky
 import pytest
 
-import coverage
-from coverage import env
-from coverage.data import sorted_lines
-from coverage.files import abs_file
-from coverage.misc import import_local_file
+import test_conclude
+from test_conclude import env
+from test_conclude.data import sorted_lines
+from test_conclude.files import abs_file
+from test_conclude.misc import import_local_file
 
 from tests import osinfo, testenv
 from tests.coveragetest import CoverageTest
@@ -126,7 +126,7 @@ class RecursionTest(CoverageTest):
             i = 12
             """)
 
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         with swallow_warnings("Trace function changed, data is likely wrong: None"):
             self.start_import_stop(cov, "recur")
 
@@ -226,11 +226,11 @@ class MemoryFumblingTest(CoverageTest):
                     x = 2
             """)
         self.make_file("main.py", """\
-            import coverage
+            import test_conclude
             import sys
             from the_code import f
             for i in range(10000):
-                cov = coverage.Coverage(branch=True)
+                cov = test_conclude.Coverage(branch=True)
                 cov.start()
                 f()
                 cov.stop()
@@ -272,7 +272,7 @@ class PyexpatTest(CoverageTest):
 
         self.make_file("outer.py", "\n"*100 + "import trydom\na = 102\n")
 
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.erase()
 
         # Import the Python file, executing it.
@@ -379,7 +379,7 @@ class ExceptionTest(CoverageTest):
             callnames_list = callnames.split()
             calls = [getattr(sys.modules[cn], cn) for cn in callnames_list]
 
-            cov = coverage.Coverage()
+            cov = test_conclude.Coverage()
             with cov.collect():
                 # Call our list of functions: invoke the first, with the rest as
                 # an argument.
@@ -430,7 +430,7 @@ class DoctestTest(CoverageTest):
             import doctest, sys
             doctest.testmod(sys.modules[__name__])  # we're not __main__ :(
             ''')
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "the_doctest")
         data = cov.get_data()
         assert len(data.measured_files()) == 1
@@ -464,7 +464,7 @@ class GettraceTest(CoverageTest):
             """)
 
         # Use --source=sample to prevent measurement of swap.py.
-        cov = coverage.Coverage(source=["sample"])
+        cov = test_conclude.Coverage(source=["sample"])
         self.start_import_stop(cov, "main")
 
         assert self.stdout() == "10\n7\n3\n5\n9\n12\n"
@@ -572,7 +572,7 @@ class ExecTest(CoverageTest):
             print("done")                           # line 35
             """)
 
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "main")
 
         _, statements, missing, _ = cov.analysis("main.py")
@@ -585,7 +585,7 @@ class ExecTest(CoverageTest):
     def test_unencodable_filename(self) -> None:
         # https://github.com/nedbat/coveragepy/issues/891
         self.make_file("bug891.py", r"""exec(compile("pass", "\udcff.py", "exec"))""")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "bug891")
         # Saving would fail trying to encode \udcff.py
         cov.save()

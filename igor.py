@@ -79,7 +79,7 @@ def do_remove_extension(*args):
                     sys.executable,
                     "-Xutf8",
                     "-c",
-                    "import coverage; print(coverage.__file__)",
+                    "import coverage; print(test_conclude.__file__)",
                 ],
                 encoding="utf-8",
             ).strip(),
@@ -190,14 +190,14 @@ def run_tests_with_coverage(core, *runner_args):
     pth_dir = sysconfig.get_path("purelib")
     pth_path = os.path.join(pth_dir, "zzz_metacov.pth")
     with open(pth_path, "w") as pth_file:
-        pth_file.write("import coverage; coverage.process_startup()\n")
+        pth_file.write("import test_conclude; test_conclude.process_startup()\n")
 
     suffix = f"{make_env_id(core)}_{platform.platform()}"
     os.environ["COVERAGE_METAFILE"] = os.path.abspath(".metacov." + suffix)
 
-    import coverage
+    import test_conclude
 
-    cov = coverage.Coverage(config_file="metacov.ini")
+    cov = test_conclude.Coverage(config_file="metacov.ini")
     cov._warn_unimported_source = False
     cov._warn_preimported_source = False
     cov._metacov = True
@@ -208,15 +208,15 @@ def run_tests_with_coverage(core, *runner_args):
         # the mechanics here, but if I don't carry over the imported modules
         # (in covmods), then things go haywire (os is None, eventually).
         covmods = {}
-        covdir = os.path.split(coverage.__file__)[0]
+        covdir = os.path.split(test_conclude.__file__)[0]
         # We have to make a list since we'll be deleting in the loop.
         modules = list(sys.modules.items())
         for name, mod in modules:
-            if name.startswith("coverage"):
+            if name.startswith("test_conclude"):
                 if getattr(mod, "__file__", "??").startswith(covdir):
                     covmods[name] = mod
                     del sys.modules[name]
-        import coverage  # pylint: disable=reimported
+        import test_conclude  # pylint: disable=reimported
 
         sys.modules.update(covmods)
 
@@ -233,16 +233,16 @@ def run_tests_with_coverage(core, *runner_args):
 
 def do_combine_html():
     """Combine data from a meta-coverage run, and make the HTML report."""
-    import coverage
+    import test_conclude
 
     os.environ["COVERAGE_HOME"] = os.getcwd()
-    cov = coverage.Coverage(config_file="metacov.ini")
+    cov = test_conclude.Coverage(config_file="metacov.ini")
     cov.load()
     cov.combine()
     cov.save()
     # A new Coverage to turn on messages. Better would be to have tighter
     # control over message verbosity...
-    cov = coverage.Coverage(config_file="metacov.ini", messages=True)
+    cov = test_conclude.Coverage(config_file="metacov.ini", messages=True)
     cov.load()
     show_contexts = bool(
         os.getenv("COVERAGE_DYNCTX") or os.getenv("COVERAGE_CONTEXT"),
@@ -301,7 +301,7 @@ def do_zip_mods():
         zf.write("tests/zipsrc/zip1/zip1.py", "zip1/zip1.py")
 
     with zipfile.ZipFile("tests/covmain.zip", "w") as zf:
-        zf.write("coverage/__main__.py", "__main__.py")
+        zf.write("test_conclude/__main__.py", "__main__.py")
 
 
 def print_banner(label):
@@ -340,13 +340,13 @@ def do_quietly(command):
 
 def get_release_facts():
     """Return an object with facts about the current release."""
-    import coverage
-    import coverage.version
+    import test_conclude
+    import test_conclude.version
 
     facts = types.SimpleNamespace()
-    facts.ver = coverage.__version__
-    mjr, mnr, mcr, rel, ser = facts.vi = coverage.version_info
-    facts.dev = coverage.version._dev
+    facts.ver = test_conclude.__version__
+    mjr, mnr, mcr, rel, ser = facts.vi = test_conclude.version_info
+    facts.dev = test_conclude.version._dev
     facts.shortver = f"{mjr}.{mnr}.{mcr}"
     facts.anchor = facts.shortver.replace(".", "-")
     if rel == "final":
@@ -427,10 +427,10 @@ def do_bump_version():
         f"{UNRELEASED}\n\nNothing yet.\n\n\n" + SCRIV_START,
     )
 
-    # coverage/version.py
+    # test_conclude/version.py
     next_version = f"version_info = {facts.next_vi}\n_dev = 1".replace("'", '"')
     update_file(
-        "coverage/version.py", r"(?m)^version_info = .*\n_dev = \d+$", next_version,
+        "test_conclude/version.py", r"(?m)^version_info = .*\n_dev = \d+$", next_version,
     )
 
 

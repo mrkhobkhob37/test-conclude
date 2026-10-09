@@ -1,15 +1,15 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Tests for coverage.py."""
+"""Tests for test_conclude.py."""
 
 from __future__ import annotations
 
 import pytest
 
-import coverage
-from coverage import env
-from coverage.exceptions import NoDataError
+import test_conclude
+from test_conclude import env
+from test_conclude.exceptions import NoDataError
 
 from tests.coveragetest import CoverageTest
 
@@ -1642,11 +1642,11 @@ class ModuleTest(CoverageTest):
 
     def test_not_singleton(self) -> None:
         # You *can* create another coverage object.
-        coverage.Coverage()
-        coverage.Coverage()
+        test_conclude.Coverage()
+        test_conclude.Coverage()
 
     def test_old_name_and_new_name(self) -> None:
-        assert coverage.coverage is coverage.Coverage
+        assert test_conclude.coverage is test_conclude.Coverage
 
 
 class ReportingTest(CoverageTest):

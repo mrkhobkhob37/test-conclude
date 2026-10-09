@@ -19,8 +19,8 @@ from typing import Iterator
 
 import pytest
 
-from coverage import env
-from coverage.files import set_relative_directory
+from test_conclude import env
+from test_conclude.files import set_relative_directory
 
 # Pytest will rewrite assertions in test modules, but not elsewhere.
 # This tells pytest to also rewrite assertions in these files:
@@ -51,7 +51,7 @@ def set_warnings() -> None:
 
     # Don't warn about unclosed SQLite connections.
     # We don't close ":memory:" databases because we don't have a way to connect
-    # to them more than once if we close them.  In real coverage.py uses, there
+    # to them more than once if we close them.  In real test_conclude.py uses, there
     # are only a couple of them, but our test suite makes many and we get warned
     # about them all.
     # Python3.13 added this warning, but the behavior has been the same all along,
@@ -92,7 +92,7 @@ def pytest_sessionstart() -> None:
         # Create a .pth file for measuring subprocess coverage.
         pth_dir = find_writable_pth_directory()
         assert pth_dir
-        (pth_dir / "subcover.pth").write_text("import coverage; coverage.process_startup()\n")
+        (pth_dir / "subcover.pth").write_text("import test_conclude; test_conclude.process_startup()\n")
         # subcover.pth is deleted by pytest_sessionfinish below.
 
 

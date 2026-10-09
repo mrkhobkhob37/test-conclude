@@ -7,8 +7,8 @@ from __future__ import annotations
 
 import textwrap
 
-import coverage
-from coverage.files import abs_file
+import test_conclude
+from test_conclude.files import abs_file
 
 from tests.coveragetest import CoverageTest
 from tests.goldtest import contains, doesnt_contain
@@ -58,7 +58,7 @@ class ReportMapsPathsTest(CoverageTest):
 
     def test_map_paths_during_line_report_without_setting(self) -> None:
         self.make_files(data="line")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.report(show_missing=True)
         expected = textwrap.dedent(os_sep("""\
@@ -73,7 +73,7 @@ class ReportMapsPathsTest(CoverageTest):
 
     def test_map_paths_during_line_report(self) -> None:
         self.make_files(data="line", settings=True)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.report(show_missing=True)
         expected = textwrap.dedent(os_sep("""\
@@ -87,7 +87,7 @@ class ReportMapsPathsTest(CoverageTest):
 
     def test_map_paths_during_branch_report_without_setting(self) -> None:
         self.make_files(data="arcs")
-        cov = coverage.Coverage(branch=True)
+        cov = test_conclude.Coverage(branch=True)
         cov.load()
         cov.report(show_missing=True)
         expected = textwrap.dedent(os_sep("""\
@@ -102,7 +102,7 @@ class ReportMapsPathsTest(CoverageTest):
 
     def test_map_paths_during_branch_report(self) -> None:
         self.make_files(data="arcs", settings=True)
-        cov = coverage.Coverage(branch=True)
+        cov = test_conclude.Coverage(branch=True)
         cov.load()
         cov.report(show_missing=True)
         expected = textwrap.dedent(os_sep("""\
@@ -116,7 +116,7 @@ class ReportMapsPathsTest(CoverageTest):
 
     def test_map_paths_during_annotate(self) -> None:
         self.make_files(data="line", settings=True)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.annotate()
         self.assert_exists(os_sep("src/program.py,cover"))
@@ -125,7 +125,7 @@ class ReportMapsPathsTest(CoverageTest):
 
     def test_map_paths_during_html_report(self) -> None:
         self.make_files(data="line", settings=True)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.html_report()
         contains("htmlcov/index.html", os_sep("src/program.py"))
@@ -133,7 +133,7 @@ class ReportMapsPathsTest(CoverageTest):
 
     def test_map_paths_during_xml_report(self) -> None:
         self.make_files(data="line", settings=True)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.xml_report()
         contains("coverage.xml", "src/program.py")
@@ -141,7 +141,7 @@ class ReportMapsPathsTest(CoverageTest):
 
     def test_map_paths_during_json_report(self) -> None:
         self.make_files(data="line", settings=True)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.json_report()
         def os_sepj(s: str) -> str:
@@ -151,7 +151,7 @@ class ReportMapsPathsTest(CoverageTest):
 
     def test_map_paths_during_lcov_report(self) -> None:
         self.make_files(data="line", settings=True)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.lcov_report()
         contains("coverage.lcov", os_sep("src/program.py"))
@@ -203,7 +203,7 @@ class ReportWithJinjaTest(CoverageTest):
 
     def test_report(self) -> None:
         self.make_files()
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.report(show_missing=True)
         expected = textwrap.dedent("""\
@@ -217,7 +217,7 @@ class ReportWithJinjaTest(CoverageTest):
 
     def test_html(self) -> None:
         self.make_files()
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.html_report()
         contains("htmlcov/index.html", """\
@@ -235,7 +235,7 @@ class ReportWithJinjaTest(CoverageTest):
 
     def test_xml(self) -> None:
         self.make_files()
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.xml_report()
         contains("coverage.xml", 'filename="good.j2"')
@@ -249,7 +249,7 @@ class ReportWithJinjaTest(CoverageTest):
 
     def test_json(self) -> None:
         self.make_files()
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.json_report()
         contains("coverage.json",
@@ -262,7 +262,7 @@ class ReportWithJinjaTest(CoverageTest):
 
     def test_lcov(self) -> None:
         self.make_files()
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.lcov_report()
         with open("coverage.lcov") as lcov:

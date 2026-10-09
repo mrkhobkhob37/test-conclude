@@ -3,7 +3,7 @@
 
 """Code coverage measurement for Python"""
 
-# Distutils setup for coverage.py
+# Distutils setup for test_conclude (fork of coverage.py)
 # This file is used unchanged under all versions of Python.
 
 import os
@@ -22,7 +22,6 @@ from distutils import errors  # pylint: disable=wrong-import-order
 classifiers = """\
 Environment :: Console
 Intended Audience :: Developers
-License :: OSI Approved :: Apache Software License
 Operating System :: OS Independent
 Programming Language :: Python
 Programming Language :: Python :: 3
@@ -38,7 +37,7 @@ Topic :: Software Development :: Quality Assurance
 Topic :: Software Development :: Testing
 """
 
-cov_ver_py = os.path.join(os.path.split(__file__)[0], "coverage/version.py")
+cov_ver_py = os.path.join(os.path.split(__file__)[0], "test_conclude/version.py")
 with open(cov_ver_py) as version_file:
     # __doc__ will be overwritten by version.py.
     doc = __doc__
@@ -46,6 +45,11 @@ with open(cov_ver_py) as version_file:
     __version__ = __url__ = version_info = ""
     # Execute the code in version.py.
     exec(compile(version_file.read(), cov_ver_py, "exec", dont_inherit=True))
+
+# Fork note: the upstream version is frozen explicitly below so tags,
+# checkouts, and sdist builds can never silently disagree about the fork
+# version.  See test_conclude/version.py FORK_VERSION.
+FORK_VERSION = "7.5.0+epic.1"
 
 with open("README.rst") as readme:
     readme_text = readme.read()
@@ -77,24 +81,21 @@ classifier_list.append(f"Development Status :: {devstat}")
 # Create the keyword arguments for setup()
 
 setup_args = dict(
-    name="coverage",
-    version=__version__,
+    name="test-conclude",
+    version=FORK_VERSION,
     packages=[
-        "coverage",
+        "test_conclude",
     ],
     package_data={
-        "coverage": [
+        "test_conclude": [
             "htmlfiles/*.*",
             "py.typed",
         ],
     },
     entry_points={
-        # Install a script as "coverage", and as "coverage3", and as
-        # "coverage-3.7" (or whatever).
+        # Install a script as "test-conclude".
         "console_scripts": [
-            "coverage = coverage.cmdline:main",
-            "coverage%d = coverage.cmdline:main" % sys.version_info[:1],
-            "coverage-%d.%d = coverage.cmdline:main" % sys.version_info[:2],
+            "test-conclude = test_conclude.cmdline:main",
         ],
     },
     extras_require={
@@ -187,12 +188,12 @@ if compile_extension:
         dict(
             ext_modules=[
                 Extension(
-                    "coverage.tracer",
+                    "test_conclude.tracer",
                     sources=[
-                        "coverage/ctracer/datastack.c",
-                        "coverage/ctracer/filedisp.c",
-                        "coverage/ctracer/module.c",
-                        "coverage/ctracer/tracer.c",
+                        "test_conclude/ctracer/datastack.c",
+                        "test_conclude/ctracer/filedisp.c",
+                        "test_conclude/ctracer/module.c",
+                        "test_conclude/ctracer/tracer.c",
                     ],
                 ),
             ],

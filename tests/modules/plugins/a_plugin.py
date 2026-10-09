@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from coverage import CoveragePlugin
-from coverage.plugin_support import Plugins
+from test_conclude import CoveragePlugin
+from test_conclude.plugin_support import Plugins
 
 
 class Plugin(CoveragePlugin):

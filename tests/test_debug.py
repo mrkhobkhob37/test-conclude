@@ -15,15 +15,15 @@ from typing import Any, Callable, Iterable
 
 import pytest
 
-import coverage
-from coverage import env
-from coverage.debug import (
+import test_conclude
+from test_conclude import env
+from test_conclude.debug import (
     DebugControl, DebugOutputFile,
     auto_repr, clipped_repr, exc_one_line, filter_text,
     info_formatter, info_header,
     relevant_environment_display, short_id, short_filename, short_stack,
 )
-from coverage.exceptions import DataError
+from test_conclude.exceptions import DataError
 
 from tests import testenv
 from tests.coveragetest import CoverageTest
@@ -123,7 +123,7 @@ class DebugTraceTest(CoverageTest):
             """)
 
         debug_out = io.StringIO()
-        cov = coverage.Coverage(debug=debug)
+        cov = test_conclude.Coverage(debug=debug)
         cov._debug_file = debug_out
         self.start_import_stop(cov, "f1")
         cov.save()
@@ -144,7 +144,7 @@ class DebugTraceTest(CoverageTest):
         assert re.search(r"Tracing '.*f1.py'", out_text)
 
         # We should have lines like "Not tracing 'collector.py'..."
-        assert re_lines(r"^Not tracing .*: is part of coverage.py$", out_text)
+        assert re_lines(r"^Not tracing .*: is part of test_conclude.py$", out_text)
 
     def test_debug_trace_pid(self) -> None:
         out_text = self.f1_debug_output(["trace", "pid"])
@@ -173,7 +173,7 @@ class DebugTraceTest(CoverageTest):
         # as the code changes. This test is here to ensure that the debug code
         # continues working. It's ok to adjust these details over time.
         assert re_lines(r"^\s*\d+\.\w{4}: Adding file tracers: 0 files", real_messages[-1])
-        assert re_lines(r"\s+add_file_tracers : .*coverage[/\\]sqldata.py:\d+$", last_line)
+        assert re_lines(r"\s+add_file_tracers : .*test_conclude[/\\]sqldata.py:\d+$", last_line)
 
     def test_debug_config(self) -> None:
         out_text = self.f1_debug_output(["config"])
@@ -254,7 +254,7 @@ class DebugOutputTest(CoverageTest):
 
     def debug_sys(self) -> None:
         """Run just enough coverage to get full debug=sys output."""
-        cov = coverage.Coverage(debug=["sys"])
+        cov = test_conclude.Coverage(debug=["sys"])
         cov.start()
         cov.stop()
 
@@ -349,7 +349,7 @@ def f_three(*args: Any, **kwargs: Any) -> str:
 
 
 class ShortStackTest(CoverageTest):
-    """Tests of coverage.debug.short_stack."""
+    """Tests of test_conclude.debug.short_stack."""
 
     run_in_temp_dir = False
 
@@ -445,7 +445,7 @@ def test_exc_one_line() -> None:
     try:
         raise DataError("wtf?")
     except Exception as exc:
-        assert "coverage.exceptions.DataError: wtf?" == exc_one_line(exc)
+        assert "test_conclude.exceptions.DataError: wtf?" == exc_one_line(exc)
 
 
 def test_auto_repr() -> None:
@@ -456,5 +456,5 @@ def test_auto_repr() -> None:
             self.y = "hello"
         __repr__ = auto_repr
     stuff = MyStuff()
-    setattr(stuff, "$coverage.object_id", 123456)
+    setattr(stuff, "$test_conclude.object_id", 123456)
     assert re.match(r"<MyStuff @0x[a-f\d]+ x=17 y='hello'>", repr(stuff))

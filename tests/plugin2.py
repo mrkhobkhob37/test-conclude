@@ -10,9 +10,9 @@ import os.path
 from types import FrameType
 from typing import Any
 
-from coverage import CoveragePlugin, FileReporter, FileTracer
-from coverage.plugin_support import Plugins
-from coverage.types import TLineNo
+from test_conclude import CoveragePlugin, FileReporter, FileTracer
+from test_conclude.plugin_support import Plugins
+from test_conclude.types import TLineNo
 
 try:
     import third.render                 # pylint: disable=unused-import

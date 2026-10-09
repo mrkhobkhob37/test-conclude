@@ -14,10 +14,10 @@ import warnings
 
 import pytest
 
-import coverage
-from coverage.exceptions import CoverageWarning
-from coverage.files import actual_path
-from coverage.types import TArc
+import test_conclude
+from test_conclude.exceptions import CoverageWarning
+from test_conclude.files import actual_path
+from test_conclude.types import TArc
 
 from tests.coveragetest import CoverageTest
 from tests.helpers import (
@@ -109,7 +109,7 @@ class CoverageTestTest(CoverageTest):
             self.assert_recent_datetime(now_delta(1), seconds=120)
 
     def test_assert_warnings(self) -> None:
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
 
         # Make a warning, it should catch it properly.
         with self.assert_warnings(cov, ["Hello there!"]):
@@ -158,7 +158,7 @@ class CoverageTestTest(CoverageTest):
                 raise ZeroDivisionError("oops")
 
     def test_assert_no_warnings(self) -> None:
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
 
         # Happy path: no warnings.
         with self.assert_warnings(cov, []):

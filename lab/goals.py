@@ -21,7 +21,7 @@ import sys
 
 from wcmatch import fnmatch as wcfnmatch    # python -m pip install wcmatch
 
-from coverage.results import Numbers        # Note: an internal class!
+from test_conclude.results import Numbers        # Note: an internal class!
 
 
 def select_files(files, pat):

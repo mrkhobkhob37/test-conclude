@@ -18,7 +18,7 @@ from typing import Any, Callable, Iterable, Iterator, Tuple, cast
 
 import pytest
 
-from coverage.misc import SysModuleSaver
+from test_conclude.misc import SysModuleSaver
 from tests.helpers import change_dir, make_file, remove_tree
 
 

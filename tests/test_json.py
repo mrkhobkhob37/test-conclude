@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Test json-based summary reporting for coverage.py"""
+"""Test json-based summary reporting for test_conclude.py"""
 
 from __future__ import annotations
 
@@ -11,15 +11,15 @@ import os
 from datetime import datetime
 from typing import Any
 
-import coverage
-from coverage import Coverage
-from coverage.jsonreport import FORMAT_VERSION
+import test_conclude
+from test_conclude import Coverage
+from test_conclude.jsonreport import FORMAT_VERSION
 
 from tests.coveragetest import UsingModulesMixin, CoverageTest
 
 
 class JsonReportTest(UsingModulesMixin, CoverageTest):
-    """Tests of the JSON reports from coverage.py."""
+    """Tests of the JSON reports from test_conclude.py."""
 
     def _assert_expected_json_report(
         self,
@@ -52,12 +52,12 @@ class JsonReportTest(UsingModulesMixin, CoverageTest):
         del (parsed_result['meta']['timestamp'])
         expected_result["meta"].update({
             "format": FORMAT_VERSION,
-            "version": coverage.__version__,
+            "version": test_conclude.__version__,
         })
         assert parsed_result == expected_result
 
     def test_branch_coverage(self) -> None:
-        cov = coverage.Coverage(branch=True)
+        cov = test_conclude.Coverage(branch=True)
         expected_result = {
             'meta': {
                 "branch_coverage": True,
@@ -108,7 +108,7 @@ class JsonReportTest(UsingModulesMixin, CoverageTest):
         self._assert_expected_json_report(cov, expected_result)
 
     def test_simple_line_coverage(self) -> None:
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         expected_result = {
             'meta': {
                 "branch_coverage": False,
@@ -152,7 +152,7 @@ class JsonReportTest(UsingModulesMixin, CoverageTest):
             [json]
             show_contexts = True
             """)
-        cov = coverage.Coverage(context="cool_test", config_file="config")
+        cov = test_conclude.Coverage(context="cool_test", config_file="config")
         expected_result = {
             'meta': {
                 "branch_coverage": False,

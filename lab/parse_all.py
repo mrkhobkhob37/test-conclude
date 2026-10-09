@@ -3,7 +3,7 @@
 import os
 import sys
 
-from coverage.parser import PythonParser
+from test_conclude.parser import PythonParser
 
 for root, dirnames, filenames in os.walk(sys.argv[1]):
     for filename in filenames:

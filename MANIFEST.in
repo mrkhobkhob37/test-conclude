@@ -30,8 +30,8 @@ recursive-include ci *
 recursive-include lab *
 recursive-include .github *
 
-recursive-include coverage *.pyi
-recursive-include coverage/ctracer *.c *.h
+recursive-include test_conclude *.pyi
+recursive-include test_conclude/ctracer *.c *.h
 
 recursive-include doc *.py *.in *.pip *.rst *.txt *.png
 recursive-include doc/_static *

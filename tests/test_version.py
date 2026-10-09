@@ -5,8 +5,8 @@
 
 from __future__ import annotations
 
-import coverage
-from coverage.version import _make_url, _make_version
+import test_conclude
+from test_conclude.version import _make_url, _make_version
 
 from tests.coveragetest import CoverageTest
 
@@ -18,9 +18,9 @@ class VersionTest(CoverageTest):
 
     def test_version_info(self) -> None:
         # Make sure we didn't screw up the version_info tuple.
-        assert isinstance(coverage.version_info, tuple)
-        assert [type(d) for d in coverage.version_info] == [int, int, int, str, int]
-        assert coverage.version_info[3] in {'alpha', 'beta', 'candidate', 'final'}
+        assert isinstance(test_conclude.version_info, tuple)
+        assert [type(d) for d in test_conclude.version_info] == [int, int, int, str, int]
+        assert test_conclude.version_info[3] in {'alpha', 'beta', 'candidate', 'final'}
 
     def test_make_version(self) -> None:
         assert _make_version(4, 0, 0, 'alpha') == "4.0.0a0"

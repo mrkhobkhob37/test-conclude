@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Tests for coverage.py's arc measurement."""
+"""Tests for test_conclude.py's arc measurement."""
 
 from __future__ import annotations
 
@@ -10,10 +10,10 @@ import pytest
 from tests.coveragetest import CoverageTest
 from tests.helpers import assert_count_equal, xfail_pypy38
 
-import coverage
-from coverage import env
-from coverage.data import sorted_lines
-from coverage.files import abs_file
+import test_conclude
+from test_conclude import env
+from test_conclude.data import sorted_lines
+from test_conclude.files import abs_file
 
 
 # When a try block ends, does the finally block (incorrectly) jump to the
@@ -25,7 +25,7 @@ xfail_pypy_3882 = pytest.mark.xfail(
 )
 
 class SimpleArcTest(CoverageTest):
-    """Tests for coverage.py's arc measurement."""
+    """Tests for test_conclude.py's arc measurement."""
 
     def test_simple_sequence(self) -> None:
         self.check_coverage("""\
@@ -470,7 +470,7 @@ class LoopArcTest(CoverageTest):
                 while True:
                     return 1
             """)
-        cov = coverage.Coverage(source=["."], branch=True)
+        cov = test_conclude.Coverage(source=["."], branch=True)
         self.start_import_stop(cov, "main")
         assert self.stdout() == 'done\n'
         if env.PYBEHAVIOR.keep_constant_test:
@@ -2082,7 +2082,7 @@ class LineDataTest(CoverageTest):
     """Tests that line_data gives us what we expect."""
 
     def test_branch(self) -> None:
-        cov = coverage.Coverage(branch=True)
+        cov = test_conclude.Coverage(branch=True)
 
         self.make_file("fun1.py", """\
             def fun1(x):

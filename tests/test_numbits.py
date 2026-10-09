@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Tests for coverage.numbits"""
+"""Tests for test_conclude.numbits"""
 
 from __future__ import annotations
 
@@ -13,8 +13,8 @@ from typing import Iterable
 from hypothesis import example, given, settings
 from hypothesis.strategies import sets, integers
 
-from coverage import env
-from coverage.numbits import (
+from test_conclude import env
+from test_conclude.numbits import (
     nums_to_numbits, numbits_to_nums, numbits_union, numbits_intersection,
     numbits_any_intersection, num_in_numbits, register_sqlite_functions,
 )

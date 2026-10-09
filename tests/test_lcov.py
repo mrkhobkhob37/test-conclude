@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Test LCOV-based summary reporting for coverage.py."""
+"""Test LCOV-based summary reporting for test_conclude.py."""
 
 from __future__ import annotations
 
@@ -10,12 +10,12 @@ import textwrap
 
 from tests.coveragetest import CoverageTest
 
-import coverage
-from coverage import env
+import test_conclude
+from test_conclude import env
 
 
 class LcovTest(CoverageTest):
-    """Tests of the LCOV reports from coverage.py."""
+    """Tests of the LCOV reports from test_conclude.py."""
 
     def create_initial_files(self) -> None:
         """
@@ -69,7 +69,7 @@ class LcovTest(CoverageTest):
             end_of_record
             """)
         self.assert_doesnt_exist(".coverage")
-        cov = coverage.Coverage(source=["."])
+        cov = test_conclude.Coverage(source=["."])
         self.start_import_stop(cov, "main_file")
         pct = cov.lcov_report()
         assert pct == 50.0
@@ -82,7 +82,7 @@ class LcovTest(CoverageTest):
         self.create_initial_files()
         self.assert_doesnt_exist(".coverage")
         self.make_file(".coveragerc", "[lcov]\noutput = data.lcov\n")
-        cov = coverage.Coverage(source=".")
+        cov = test_conclude.Coverage(source=".")
         self.start_import_stop(cov, "test_file")
         pct = cov.lcov_report()
         assert pct == 50.0
@@ -124,7 +124,7 @@ class LcovTest(CoverageTest):
                     return False
             """)
         self.assert_doesnt_exist(".coverage")
-        cov = coverage.Coverage(branch=True, source=".")
+        cov = test_conclude.Coverage(branch=True, source=".")
         self.start_import_stop(cov, "main_file")
         pct = cov.lcov_report()
         assert math.isclose(pct, 16.666666666666668)
@@ -168,7 +168,7 @@ class LcovTest(CoverageTest):
                     self.assertEqual(is_it_x(4), False)
             """)
         self.assert_doesnt_exist(".coverage")
-        cov = coverage.Coverage(branch=True, source=".")
+        cov = test_conclude.Coverage(branch=True, source=".")
         self.start_import_stop(cov, "test_file")
         pct = cov.lcov_report()
         assert math.isclose(pct, 41.666666666666664)
@@ -216,7 +216,7 @@ class LcovTest(CoverageTest):
                 print("No, nothing")
             """)
         self.assert_doesnt_exist(".coverage")
-        cov = coverage.Coverage(branch=True, source=".")
+        cov = test_conclude.Coverage(branch=True, source=".")
         self.start_import_stop(cov, "main_file")
         pct = cov.lcov_report()
         assert math.isclose(pct, 66.66666666666667)
@@ -250,7 +250,7 @@ class LcovTest(CoverageTest):
 
         self.make_file("__init__.py", "")
         self.assert_doesnt_exist(".coverage")
-        cov = coverage.Coverage(branch=True, source=".")
+        cov = test_conclude.Coverage(branch=True, source=".")
         self.start_import_stop(cov, "__init__")
         pct = cov.lcov_report()
         assert pct == 0.0
@@ -295,7 +295,7 @@ class LcovTest(CoverageTest):
             # foo 7
             # line 8
             """)
-        cov = coverage.Coverage(source=".", branch=True)
+        cov = test_conclude.Coverage(source=".", branch=True)
         self.start_import_stop(cov, "runme")
         cov.lcov_report()
         expected_result = textwrap.dedent("""\

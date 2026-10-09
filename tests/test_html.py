@@ -19,13 +19,13 @@ from typing import Any, IO
 
 import pytest
 
-import coverage
-from coverage import env, Coverage
-from coverage.exceptions import NoDataError, NotPython, NoSource
-from coverage.files import abs_file, flat_rootname
-import coverage.html
-from coverage.report_core import get_analysis_to_report
-from coverage.types import TLineNo, TMorf
+import test_conclude
+from test_conclude import env, Coverage
+from test_conclude.exceptions import NoDataError, NotPython, NoSource
+from test_conclude.files import abs_file, flat_rootname
+import test_conclude.html
+from test_conclude.report_core import get_analysis_to_report
+from test_conclude.types import TLineNo, TMorf
 
 from tests import testenv
 from tests.coveragetest import CoverageTest, TESTS_DIR
@@ -59,9 +59,9 @@ class HtmlTestHelpers(CoverageTest):
         covargs: dict[str, Any] | None = None,
         htmlargs: dict[str, Any] | None = None,
     ) -> float:
-        """Run coverage.py on main_file.py, and create an HTML report."""
+        """Run test_conclude.py on main_file.py, and create an HTML report."""
         self.clean_local_file_imports()
-        cov = coverage.Coverage(**(covargs or {}))
+        cov = test_conclude.Coverage(**(covargs or {}))
         self.start_import_stop(cov, "main_file")
         ret = cov.html_report(**(htmlargs or {}))
         self.assert_valid_hrefs()
@@ -151,10 +151,10 @@ class HtmlDeltaTest(HtmlTestHelpers, CoverageTest):
     def setUp(self) -> None:
         super().setUp()
 
-        # At least one of our tests monkey-patches the version of coverage.py,
+        # At least one of our tests monkey-patches the version of test_conclude.py,
         # so grab it here to restore it later.
-        self.real_coverage_version = coverage.__version__
-        self.addCleanup(setattr, coverage, "__version__", self.real_coverage_version)
+        self.real_coverage_version = test_conclude.__version__
+        self.addCleanup(setattr, test_conclude, "__version__", self.real_coverage_version)
 
         self.files_written: set[str]
 
@@ -174,7 +174,7 @@ class HtmlDeltaTest(HtmlTestHelpers, CoverageTest):
         covargs['source'] = "."
         self.files_written = set()
         mock_open = FileWriteTracker(self.files_written).open
-        with mock.patch("coverage.html.open", mock_open):
+        with mock.patch("test_conclude.html.open", mock_open):
             return super().run_coverage(covargs=covargs, htmlargs=htmlargs)
 
     def assert_htmlcov_files_exist(self) -> None:
@@ -247,7 +247,7 @@ class HtmlDeltaTest(HtmlTestHelpers, CoverageTest):
 
     def test_html_delta_from_settings_change(self) -> None:
         # HTML generation can create only the files that have changed.
-        # In this case, everything changes because the coverage.py settings
+        # In this case, everything changes because the test_conclude.py settings
         # have changed.
         self.create_initial_files()
         self.run_coverage(covargs=dict(omit=[]))
@@ -267,14 +267,14 @@ class HtmlDeltaTest(HtmlTestHelpers, CoverageTest):
 
     def test_html_delta_from_coverage_version_change(self) -> None:
         # HTML generation can create only the files that have changed.
-        # In this case, everything changes because the coverage.py version has
+        # In this case, everything changes because the test_conclude.py version has
         # changed.
         self.create_initial_files()
         self.run_coverage()
         index1 = self.get_html_index_content()
 
-        # "Upgrade" coverage.py!
-        coverage.__version__ = "XYZZY"
+        # "Upgrade" test_conclude.py!
+        test_conclude.__version__ = "XYZZY"
 
         self.run_coverage()
 
@@ -387,7 +387,7 @@ class HtmlWithUnparsableFilesTest(HtmlTestHelpers, CoverageTest):
     def test_dotpy_not_python(self) -> None:
         self.make_file("main.py", "import innocuous")
         self.make_file("innocuous.py", "a = 1")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "main")
         self.make_file("innocuous.py", "<h1>This isn't python!</h1>")
         msg = "Couldn't parse '.*innocuous.py' as Python source: .* at line 1"
@@ -397,7 +397,7 @@ class HtmlWithUnparsableFilesTest(HtmlTestHelpers, CoverageTest):
     def test_dotpy_not_python_ignored(self) -> None:
         self.make_file("main.py", "import innocuous")
         self.make_file("innocuous.py", "a = 2")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "main")
 
         self.make_file("innocuous.py", "<h1>This isn't python!</h1>")
@@ -417,7 +417,7 @@ class HtmlWithUnparsableFilesTest(HtmlTestHelpers, CoverageTest):
         self.make_data_file(lines={abs_file("innocuous.html"): [1]})
         # Before reporting, change it to be an HTML file.
         self.make_file("innocuous.html", "<h1>This isn't python at all!</h1>")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         with pytest.raises(NoDataError, match="No data to report."):
             cov.html_report()
@@ -429,7 +429,7 @@ class HtmlWithUnparsableFilesTest(HtmlTestHelpers, CoverageTest):
         source = "exec(compile('','','exec'), {'__file__': 'liar.html'})"
         self.make_file("liar.py", source)
         self.make_file("liar.html", "{# Whoops, not python code #}")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "liar")
         cov.html_report()
         self.assert_exists("htmlcov/index.html")
@@ -442,7 +442,7 @@ class HtmlWithUnparsableFilesTest(HtmlTestHelpers, CoverageTest):
         self.make_file("liar.py", source)
         # Tokenize will raise an IndentationError if it can't dedent.
         self.make_file("liar.html", "0\n  2\n 1\n")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "liar")
         cov.html_report()
         self.assert_exists("htmlcov/index.html")
@@ -458,7 +458,7 @@ class HtmlWithUnparsableFilesTest(HtmlTestHelpers, CoverageTest):
             # coding: utf-8
             a = 1  # Isn't this great?!
             """)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "main")
 
         # Create the undecodable version of the file. make_file is too helpful,
@@ -479,7 +479,7 @@ class HtmlWithUnparsableFilesTest(HtmlTestHelpers, CoverageTest):
     def test_formfeeds(self) -> None:
         # https://github.com/nedbat/coveragepy/issues/360
         self.make_file("formfeed.py", "line_one = 1\n\f\nline_two = 2\n")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "formfeed")
         cov.html_report()
 
@@ -506,7 +506,7 @@ class HtmlWithUnparsableFilesTest(HtmlTestHelpers, CoverageTest):
             }
             DONE = 1
             """)
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "splitlines_is_weird")
         cov.html_report()
 
@@ -527,7 +527,7 @@ class HtmlTest(HtmlTestHelpers, CoverageTest):
         self.make_file("thefile.py", "import sub.another\n")
         self.make_file("sub/__init__.py", "")
         self.make_file("sub/another.py", "print('another')\n")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, 'thefile')
         os.remove("sub/another.py")
 
@@ -547,7 +547,7 @@ class HtmlTest(HtmlTestHelpers, CoverageTest):
             abs_file("program"): [1],
             abs_file("program.py"): [1],
         })
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.html_report()
         self.assert_exists("htmlcov/index.html")
@@ -688,7 +688,7 @@ def compare_html(
     __tracebackhide__ = True    # pytest, please don't show me this function.
     scrubs = [
         (r'/coverage\.readthedocs\.io/?[-.\w/]*', '/coverage.readthedocs.io/VER'),
-        (r'coverage\.py v[\d.abcdev]+', 'coverage.py vVER'),
+        (r'test-conclude v[\d.abcdev+]+', 'test-conclude vVER'),
         (r'created at \d\d\d\d-\d\d-\d\d \d\d:\d\d [-+]\d\d\d\d', 'created at DATE'),
         (r'created at \d\d\d\d-\d\d-\d\d \d\d:\d\d', 'created at DATE'),
         # Occasionally an absolute path is in the HTML report.
@@ -721,7 +721,7 @@ class HtmlGoldTest(CoverageTest):
                 a = 4
             """)
 
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         a = self.start_import_stop(cov, "a")
         cov.html_report(a, directory='out/a')
 
@@ -776,7 +776,7 @@ class HtmlGoldTest(CoverageTest):
             three()
             """)
 
-        cov = coverage.Coverage(branch=True)
+        cov = test_conclude.Coverage(branch=True)
         b = self.start_import_stop(cov, "b")
         cov.html_report(b, directory="out/b_branch")
 
@@ -827,7 +827,7 @@ assert len(math.encode('utf-8')) == 21
             assert data[:3] == b"\xef\xbb\xbf"
             assert data.count(b"\r\n") == 5
 
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         bom = self.start_import_stop(cov, "bom")
         cov.html_report(bom, directory="out/bom")
 
@@ -846,7 +846,7 @@ math = "3\xd74 = 12, \xf72 = 6\xb10"
 assert len(math) == 18
 """)
 
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         isolatin1 = self.start_import_stop(cov, "isolatin1")
         cov.html_report(isolatin1, directory="out/isolatin1")
 
@@ -885,21 +885,21 @@ assert len(math) == 18
 
     def test_omit_1(self) -> None:
         self.make_main_etc()
-        cov = coverage.Coverage(include=["./*"])
+        cov = test_conclude.Coverage(include=["./*"])
         self.start_import_stop(cov, "main")
         cov.html_report(directory="out/omit_1")
         compare_html(gold_path("html/omit_1"), "out/omit_1")
 
     def test_omit_2(self) -> None:
         self.make_main_etc()
-        cov = coverage.Coverage(include=["./*"])
+        cov = test_conclude.Coverage(include=["./*"])
         self.start_import_stop(cov, "main")
         cov.html_report(directory="out/omit_2", omit=["m1.py"])
         compare_html(gold_path("html/omit_2"), "out/omit_2")
 
     def test_omit_3(self) -> None:
         self.make_main_etc()
-        cov = coverage.Coverage(include=["./*"])
+        cov = test_conclude.Coverage(include=["./*"])
         self.start_import_stop(cov, "main")
         cov.html_report(directory="out/omit_3", omit=["m1.py", "m2.py"])
         compare_html(gold_path("html/omit_3"), "out/omit_3")
@@ -911,7 +911,7 @@ assert len(math) == 18
             omit = m2.py
             """)
 
-        cov = coverage.Coverage(config_file="omit4.ini", include=["./*"])
+        cov = test_conclude.Coverage(config_file="omit4.ini", include=["./*"])
         self.start_import_stop(cov, "main")
         cov.html_report(directory="out/omit_4")
         compare_html(gold_path("html/omit_4"), "out/omit_4")
@@ -929,7 +929,7 @@ assert len(math) == 18
             directory = out/omit_5
             """)
 
-        cov = coverage.Coverage(config_file="omit5.ini", include=["./*"])
+        cov = test_conclude.Coverage(config_file="omit5.ini", include=["./*"])
         self.start_import_stop(cov, "main")
         cov.html_report()
         compare_html(gold_path("html/omit_5"), "out/omit_5")
@@ -952,7 +952,7 @@ assert len(math) == 18
 
         with change_dir("src"):
             sys.path.insert(0, "../othersrc")
-            cov = coverage.Coverage(include=["./*", "../othersrc/*"])
+            cov = test_conclude.Coverage(include=["./*", "../othersrc/*"])
             self.start_import_stop(cov, "here")
             cov.html_report(directory="../out/other")
 
@@ -1003,7 +1003,7 @@ assert len(math) == 18
                 raise ZeroDivisionError
             """)
 
-        cov = coverage.Coverage(config_file="partial.ini")
+        cov = test_conclude.Coverage(config_file="partial.ini")
         partial = self.start_import_stop(cov, "partial")
 
         if env.PYBEHAVIOR.pep626:
@@ -1052,7 +1052,7 @@ assert len(math) == 18
 
         self.make_file("extra.css", "/* Doesn't matter what goes in here, it gets copied. */\n")
 
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         a = self.start_import_stop(cov, "a")
         cov.html_report(a, directory="out/styled", extra_css="extra.css")
 
@@ -1091,7 +1091,7 @@ assert len(math) == 18
             \tc = "Done"\t\t\t\t# line up.
             """)
 
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         tabbed = self.start_import_stop(cov, "tabbed")
         cov.html_report(tabbed, directory="out")
 
@@ -1119,7 +1119,7 @@ assert len(math) == 18
             surrogate = "db40,dd00: x@"
             """.replace("@", surrogate))
 
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         unimod = self.start_import_stop(cov, "unicode")
         cov.html_report(unimod, directory="out/unicode")
 
@@ -1139,7 +1139,7 @@ assert len(math) == 18
         # Make a file with a non-ascii character in the filename.
         self.make_file("h\xe2t.py", "print('accented')")
         self.make_data_file(lines={abs_file("h\xe2t.py"): [1]})
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.html_report()
         self.assert_exists("htmlcov/h\xe2t_py.html")
@@ -1153,7 +1153,7 @@ assert len(math) == 18
         self.make_data_file(lines={abs_file("\xe2/accented.py"): [1]})
 
         # The HTML report uses ascii-encoded HTML entities.
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.html_report()
         self.assert_exists("htmlcov/z_5786906b6f0ffeb4_accented_py.html")
@@ -1167,12 +1167,12 @@ assert len(math) == 18
 class HtmlWithContextsTest(HtmlTestHelpers, CoverageTest):
     """Tests of the HTML reports with shown contexts."""
 
-    EMPTY = coverage.html.HtmlDataGeneration.EMPTY
+    EMPTY = test_conclude.html.HtmlDataGeneration.EMPTY
 
-    def html_data_from_cov(self, cov: Coverage, morf: TMorf) -> coverage.html.FileData:
+    def html_data_from_cov(self, cov: Coverage, morf: TMorf) -> test_conclude.html.FileData:
         """Get HTML report data from a `Coverage` object for a morf."""
         with self.assert_warnings(cov, []):
-            datagen = coverage.html.HtmlDataGeneration(cov)
+            datagen = test_conclude.html.HtmlDataGeneration(cov)
             fr, analysis = next(get_analysis_to_report(cov, [morf]))
             file_data = datagen.data_for_file(fr, analysis)
             return file_data
@@ -1208,7 +1208,7 @@ class HtmlWithContextsTest(HtmlTestHelpers, CoverageTest):
 
     def test_dynamic_contexts(self) -> None:
         self.make_file("two_tests.py", self.SOURCE)
-        cov = coverage.Coverage(source=["."])
+        cov = test_conclude.Coverage(source=["."])
         cov.set_option("run:dynamic_context", "test_function")
         cov.set_option("html:show_contexts", True)
         mod = self.start_import_stop(cov, "two_tests")
@@ -1227,7 +1227,7 @@ class HtmlWithContextsTest(HtmlTestHelpers, CoverageTest):
 
     def test_filtered_dynamic_contexts(self) -> None:
         self.make_file("two_tests.py", self.SOURCE)
-        cov = coverage.Coverage(source=["."])
+        cov = test_conclude.Coverage(source=["."])
         cov.set_option("run:dynamic_context", "test_function")
         cov.set_option("html:show_contexts", True)
         cov.set_option("report:contexts", ["test_one"])
@@ -1243,7 +1243,7 @@ class HtmlWithContextsTest(HtmlTestHelpers, CoverageTest):
     def test_no_contexts_warns_no_contexts(self) -> None:
         # If no contexts were collected, then show_contexts emits a warning.
         self.make_file("two_tests.py", self.SOURCE)
-        cov = coverage.Coverage(source=["."])
+        cov = test_conclude.Coverage(source=["."])
         cov.set_option("html:show_contexts", True)
         self.start_import_stop(cov, "two_tests")
         with self.assert_warnings(cov, ["No contexts were measured"]):
@@ -1252,7 +1252,7 @@ class HtmlWithContextsTest(HtmlTestHelpers, CoverageTest):
     def test_dynamic_contexts_relative_files(self) -> None:
         self.make_file("two_tests.py", self.SOURCE)
         self.make_file("config", "[run]\nrelative_files = True")
-        cov = coverage.Coverage(source=["."], config_file="config")
+        cov = test_conclude.Coverage(source=["."], config_file="config")
         cov.set_option("run:dynamic_context", "test_function")
         cov.set_option("html:show_contexts", True)
         mod = self.start_import_stop(cov, "two_tests")
@@ -1291,4 +1291,4 @@ class HtmlHelpersTest(HtmlTestHelpers, CoverageTest):
     (999999999, "e9S_p"),
 ])
 def test_encode_int(n: int, key: str) -> None:
-    assert coverage.html.encode_int(n) == key
+    assert test_conclude.html.encode_int(n) == key

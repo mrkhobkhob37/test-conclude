@@ -13,10 +13,10 @@ from unittest import mock
 
 import pytest
 
-import coverage
-from coverage.context import qualname_from_frame
-from coverage.data import CoverageData, sorted_lines
-from coverage.types import TArc, TCovKwargs, TLineNo
+import test_conclude
+from test_conclude.context import qualname_from_frame
+from test_conclude.data import CoverageData, sorted_lines
+from test_conclude.types import TArc, TCovKwargs, TLineNo
 
 from tests import testenv
 from tests.coveragetest import CoverageTest
@@ -28,14 +28,14 @@ class StaticContextTest(CoverageTest):
 
     def test_no_context(self) -> None:
         self.make_file("main.py", "a = 1")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "main")
         data = cov.get_data()
         assert_count_equal(data.measured_contexts(), [""])
 
     def test_static_context(self) -> None:
         self.make_file("main.py", "a = 1")
-        cov = coverage.Coverage(context="gooey")
+        cov = test_conclude.Coverage(context="gooey")
         self.start_import_stop(cov, "main")
         data = cov.get_data()
         assert_count_equal(data.measured_contexts(), ["gooey"])
@@ -53,13 +53,13 @@ class StaticContextTest(CoverageTest):
     def run_red_blue(self, **options: TCovKwargs) -> tuple[CoverageData, CoverageData]:
         """Run red.py and blue.py, and return their CoverageData objects."""
         self.make_file("red.py", self.SOURCE)
-        red_cov = coverage.Coverage(context="red", data_suffix="r", source=["."], **options)
+        red_cov = test_conclude.Coverage(context="red", data_suffix="r", source=["."], **options)
         self.start_import_stop(red_cov, "red")
         red_cov.save()
         red_data = red_cov.get_data()
 
         self.make_file("blue.py", self.SOURCE)
-        blue_cov = coverage.Coverage(context="blue", data_suffix="b", source=["."], **options)
+        blue_cov = test_conclude.Coverage(context="blue", data_suffix="b", source=["."], **options)
         self.start_import_stop(blue_cov, "blue")
         blue_cov.save()
         blue_data = blue_cov.get_data()
@@ -160,7 +160,7 @@ class DynamicContextTest(CoverageTest):
 
     def test_dynamic_alone(self) -> None:
         self.make_file("two_tests.py", self.SOURCE)
-        cov = coverage.Coverage(source=["."])
+        cov = test_conclude.Coverage(source=["."])
         cov.set_option("run:dynamic_context", "test_function")
         self.start_import_stop(cov, "two_tests")
         data = cov.get_data()
@@ -182,7 +182,7 @@ class DynamicContextTest(CoverageTest):
 
     def test_static_and_dynamic(self) -> None:
         self.make_file("two_tests.py", self.SOURCE)
-        cov = coverage.Coverage(context="stat", source=["."])
+        cov = test_conclude.Coverage(context="stat", source=["."])
         cov.set_option("run:dynamic_context", "test_function")
         self.start_import_stop(cov, "two_tests")
         data = cov.get_data()

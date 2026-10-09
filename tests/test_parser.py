@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Tests for coverage.py's code parsing."""
+"""Tests for test_conclude.py's code parsing."""
 
 from __future__ import annotations
 
@@ -9,16 +9,16 @@ import textwrap
 
 import pytest
 
-from coverage import env
-from coverage.exceptions import NotPython
-from coverage.parser import PythonParser
+from test_conclude import env
+from test_conclude.exceptions import NotPython
+from test_conclude.parser import PythonParser
 
 from tests.coveragetest import CoverageTest
 from tests.helpers import arcz_to_arcs, xfail_pypy38
 
 
 class PythonParserTestBase(CoverageTest):
-    """Tests for coverage.py's Python code parsing."""
+    """Tests for test_conclude.py's Python code parsing."""
 
     run_in_temp_dir = False
 
@@ -31,7 +31,7 @@ class PythonParserTestBase(CoverageTest):
 
 
 class PythonParserTest(PythonParserTestBase):
-    """Tests of coverage.parser."""
+    """Tests of test_conclude.parser."""
 
     def test_exit_counts(self) -> None:
         parser = self.parse_text("""\
@@ -412,7 +412,7 @@ class ExclusionParserTest(PythonParserTestBase):
         assert parser.statements == {1,2,3,4,7,8,9}
 
     def test_excluding_if_pass(self) -> None:
-        # From a comment on the coverage.py page by Michael McNeil Forbes:
+        # From a comment on the test_conclude.py page by Michael McNeil Forbes:
         parser = self.parse_text("""\
             def f():
                 if False:    # pragma: nocover
@@ -923,7 +923,7 @@ class ParserMissingArcDescriptionTest(PythonParserTestBase):
 
 
 class ParserFileTest(CoverageTest):
-    """Tests for coverage.py's code parsing from files."""
+    """Tests for test_conclude.py's code parsing from files."""
 
     def parse_file(self, filename: str) -> PythonParser:
         """Parse `text` as source, and return the `PythonParser` used."""

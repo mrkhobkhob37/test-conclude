@@ -5,7 +5,7 @@ from itertools import cycle, product
 import random
 import re
 
-from coverage.parser import PythonParser
+from test_conclude.parser import PythonParser
 
 
 class PythonSpinner:

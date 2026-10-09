@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Helpers for coverage.py tests."""
+"""Helpers for test_conclude.py tests."""
 
 from __future__ import annotations
 
@@ -25,11 +25,11 @@ from typing import (
 import flaky
 import pytest
 
-from coverage import env
-from coverage.debug import DebugControl
-from coverage.exceptions import CoverageWarning
-from coverage.misc import output_encoding
-from coverage.types import TArc, TLineNo
+from test_conclude import env
+from test_conclude.debug import DebugControl
+from test_conclude.exceptions import CoverageWarning
+from test_conclude.misc import output_encoding
+from test_conclude.types import TArc, TLineNo
 
 
 def run_command(cmd: str) -> tuple[int, str]:

@@ -21,12 +21,12 @@ from typing import Iterable
 from flaky import flaky
 import pytest
 
-import coverage
-from coverage import env
-from coverage.data import line_counts
-from coverage.exceptions import ConfigError
-from coverage.files import abs_file
-from coverage.misc import import_local_file
+import test_conclude
+from test_conclude import env
+from test_conclude.data import line_counts
+from test_conclude.exceptions import ConfigError
+from test_conclude.files import abs_file
+from test_conclude.misc import import_local_file
 
 from tests import testenv
 from tests.coveragetest import CoverageTest
@@ -177,7 +177,7 @@ SIMPLE = """
 
 
 def cant_trace_msg(concurrency: str, the_module: ModuleType | None) -> str | None:
-    """What might coverage.py say about a concurrency setting and imported module?"""
+    """What might test_conclude.py say about a concurrency setting and imported module?"""
     # In the concurrency choices, "multiprocessing" doesn't count, so remove it.
     if "multiprocessing" in concurrency:
         parts = concurrency.split(",")
@@ -200,7 +200,7 @@ def cant_trace_msg(concurrency: str, the_module: ModuleType | None) -> str | Non
 
 
 class ConcurrencyTest(CoverageTest):
-    """Tests of the concurrency support in coverage.py."""
+    """Tests of the concurrency support in test_conclude.py."""
 
     QLIMIT = 1000
 
@@ -239,7 +239,7 @@ class ConcurrencyTest(CoverageTest):
 
             # Read the coverage file and see that try_it.py has all its lines
             # executed.
-            data = coverage.CoverageData(".coverage")
+            data = test_conclude.CoverageData(".coverage")
             data.read()
 
             # If the test fails, it's helpful to see this info:
@@ -627,7 +627,7 @@ def test_coverage_stop_in_threads() -> None:
                 return
         has_stopped_coverage.append(ident)
 
-    cov = coverage.Coverage()
+    cov = test_conclude.Coverage()
     with cov.collect():
         t = threading.Thread(target=run_thread)
         t.start()
@@ -673,7 +673,7 @@ def test_thread_safe_save_data(tmp_path: pathlib.Path) -> None:
         #  still running.
         duration = 0.01
         for _ in range(3):
-            cov = coverage.Coverage()
+            cov = test_conclude.Coverage()
             with cov.collect():
                 threads = [threading.Thread(target=random_load) for _ in range(10)]
                 should_run[0] = True

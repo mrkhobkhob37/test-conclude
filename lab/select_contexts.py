@@ -9,7 +9,7 @@ import argparse
 import re
 import sys
 
-import coverage
+import test_conclude
 
 
 def main(argv):

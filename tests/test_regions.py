@@ -11,10 +11,10 @@ from pathlib import Path
 
 import pytest
 
-import coverage
-from coverage import env
-from coverage.plugin import CodeRegion
-from coverage.regions import code_regions
+import test_conclude
+from test_conclude import env
+from test_conclude.plugin import CodeRegion
+from test_conclude.regions import code_regions
 
 
 skip_pypy38 = pytest.mark.skipif(
@@ -99,7 +99,7 @@ def test_real_code_regions() -> None:
     # Run code_regions on most of the coverage source code, checking that it
     # succeeds and there are no overlaps.
 
-    cov_dir = Path(coverage.__file__).parent.parent
+    cov_dir = Path(test_conclude.__file__).parent.parent
     any_fails = False
     # To run against all the files in the tox venvs:
     #   for source_file in cov_dir.rglob("*.py"):

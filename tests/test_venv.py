@@ -14,7 +14,7 @@ from typing import Iterator, cast
 
 import pytest
 
-from coverage import env
+from test_conclude import env
 
 from tests import testenv
 from tests.coveragetest import CoverageTest, COVERAGE_INSTALL_ARGS
@@ -153,11 +153,11 @@ def venv_world_fixture(tmp_path_factory: pytest.TempPathFactory) -> Path:
 
 
 @pytest.fixture(params=[
-    "coverage",
-    "python -m coverage",
+    "test-conclude",
+    "python -m test_conclude",
 ], name="coverage_command")
 def coverage_command_fixture(request: pytest.FixtureRequest) -> str:
-    """Parametrized fixture to use multiple forms of "coverage" command."""
+    """Parametrized fixture to use multiple forms of "test-conclude" command."""
     return cast(str, request.param)
 
 
@@ -192,7 +192,7 @@ class VirtualenvTest(CoverageTest):
                     os.remove(fname)
 
     def get_trace_output(self) -> str:
-        """Get the debug output of coverage.py"""
+        """Get the debug output of test_conclude.py"""
         with open("debug_out.txt") as f:
             return f.read()
 
@@ -273,7 +273,7 @@ class VirtualenvTest(CoverageTest):
         assert out == self.expected_stdout
 
         debug_out = self.get_trace_output()
-        assert re_lines(r"^Not tracing .*\bexecfile.py': is part of coverage.py", debug_out)
+        assert re_lines(r"^Not tracing .*\bexecfile.py': is part of test_conclude.py", debug_out)
         assert re_lines(r"^Tracing .*\bmyproduct.py", debug_out)
         assert re_lines(r"^Not tracing .*\bcolorsys.py': is in the stdlib", debug_out)
 

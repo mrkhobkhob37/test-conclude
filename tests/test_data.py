@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Tests for coverage.data, and coverage.sqldata."""
+"""Tests for test_conclude.data, and test_conclude.sqldata."""
 
 from __future__ import annotations
 
@@ -19,11 +19,11 @@ from unittest import mock
 
 import pytest
 
-from coverage.data import CoverageData, combine_parallel_data
-from coverage.data import add_data_to_hash, line_counts
-from coverage.exceptions import DataError, NoDataError
-from coverage.files import PathAliases, canonical_filename
-from coverage.types import FilePathClasses, FilePathType, TArc, TLineNo
+from test_conclude.data import CoverageData, combine_parallel_data
+from test_conclude.data import add_data_to_hash, line_counts
+from test_conclude.exceptions import DataError, NoDataError
+from test_conclude.files import PathAliases, canonical_filename
+from test_conclude.types import FilePathClasses, FilePathType, TArc, TLineNo
 
 from tests.coveragetest import CoverageTest
 from tests.helpers import DebugControlString, assert_count_equal

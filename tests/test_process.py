@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Tests for process behavior of coverage.py."""
+"""Tests for process behavior of test_conclude.py."""
 
 from __future__ import annotations
 
@@ -20,10 +20,10 @@ from typing import Any
 
 import pytest
 
-import coverage
-from coverage import env
-from coverage.data import line_counts
-from coverage.files import abs_file, python_reported_file
+import test_conclude
+from test_conclude import env
+from test_conclude.data import line_counts
+from test_conclude.files import abs_file, python_reported_file
 
 from tests import testenv
 from tests.coveragetest import CoverageTest, TESTS_DIR
@@ -31,7 +31,7 @@ from tests.helpers import re_line, re_lines, re_lines_text
 
 
 class ProcessTest(CoverageTest):
-    """Tests of the per-process behavior of coverage.py."""
+    """Tests of the per-process behavior of test_conclude.py."""
 
     def test_save_on_exit(self) -> None:
         self.make_file("mycode.py", """\
@@ -105,7 +105,7 @@ class ProcessTest(CoverageTest):
 
         # Read the coverage file and see that b_or_c.py has all 8 lines
         # executed.
-        data = coverage.CoverageData()
+        data = test_conclude.CoverageData()
         data.read()
         assert line_counts(data)['b_or_c.py'] == 8
 
@@ -129,7 +129,7 @@ class ProcessTest(CoverageTest):
 
         # Read the coverage file and see that b_or_c.py has all 8 lines
         # executed.
-        data = coverage.CoverageData(".mycovdata")
+        data = test_conclude.CoverageData(".mycovdata")
         data.read()
         assert line_counts(data)['b_or_c.py'] == 8
 
@@ -143,7 +143,7 @@ class ProcessTest(CoverageTest):
 
         # Read the coverage file and see that b_or_c.py has only 6 lines
         # executed.
-        data = coverage.CoverageData()
+        data = test_conclude.CoverageData()
         data.read()
         assert line_counts(data)['b_or_c.py'] == 6
 
@@ -177,7 +177,7 @@ class ProcessTest(CoverageTest):
 
         # Read the coverage file and see that b_or_c.py has all 8 lines
         # executed.
-        data = coverage.CoverageData()
+        data = test_conclude.CoverageData()
         data.read()
         assert line_counts(data)['b_or_c.py'] == 8
 
@@ -236,7 +236,7 @@ class ProcessTest(CoverageTest):
 
         # Read the coverage data file and see that the two different x.py
         # files have been combined together.
-        data = coverage.CoverageData()
+        data = test_conclude.CoverageData()
         data.read()
         summary = line_counts(data, fullpath=True)
         assert len(summary) == 1
@@ -396,7 +396,7 @@ class ProcessTest(CoverageTest):
 
         # Each data file should have a subset of the lines.
         for data_file in data_files:
-            data = coverage.CoverageData(data_file)
+            data = test_conclude.CoverageData(data_file)
             data.read()
             assert line_counts(data)["fork.py"] < total_lines
 
@@ -406,7 +406,7 @@ class ProcessTest(CoverageTest):
         self.assert_exists(".coverage")
         self.assert_file_count(".coverage.*", 0)
 
-        data = coverage.CoverageData()
+        data = test_conclude.CoverageData()
         data.read()
         assert line_counts(data)["fork.py"] == total_lines
 
@@ -496,7 +496,7 @@ class ProcessTest(CoverageTest):
         assert "Trace function changed" in out
 
     # When meta-coverage testing, this test doesn't work, because it finds
-    # coverage.py's own trace function.
+    # test_conclude.py's own trace function.
     @pytest.mark.skipif(env.METACOV, reason="Can't test timid during coverage measurement.")
     def test_timid(self) -> None:
         # Test that the --timid command line argument properly swaps the tracer
@@ -554,8 +554,8 @@ class ProcessTest(CoverageTest):
     def test_warn_preimported(self) -> None:
         self.make_file("hello.py", """\
             import goodbye
-            import coverage
-            cov = coverage.Coverage(include=["good*"], check_preimported=True)
+            import test_conclude
+            cov = test_conclude.Coverage(include=["good*"], check_preimported=True)
             cov.start()
             print(goodbye.f())
             cov.stop()
@@ -582,7 +582,7 @@ class ProcessTest(CoverageTest):
         # LANG=C forces getfilesystemencoding on Linux to 'ascii', which causes
         # failures with non-ascii file names. We don't want to make a real file
         # with strange characters, though, because that gets the test runners
-        # tangled up.  This will isolate the concerns to the coverage.py code.
+        # tangled up.  This will isolate the concerns to the test_conclude.py code.
         # https://github.com/nedbat/coveragepy/issues/533
         self.make_file("weird_file.py", r"""
             globs = {}
@@ -601,7 +601,7 @@ class ProcessTest(CoverageTest):
         self.make_file("allok.py", """\
             import warnings
             warnings.simplefilter('default')
-            import coverage
+            import test_conclude
             print("No warnings!")
             """)
 
@@ -620,11 +620,11 @@ class ProcessTest(CoverageTest):
             """)
         self.make_file("run_twice.py", """\
             import sys
-            import coverage
+            import test_conclude
 
             for i in [1, 2]:
                 sys.stderr.write(f"Run {i}\\n")
-                inst = coverage.Coverage(source=['foo'])
+                inst = test_conclude.Coverage(source=['foo'])
                 inst.load()
                 inst.start()
                 import foo
@@ -649,8 +649,8 @@ class ProcessTest(CoverageTest):
         # module, like it used to:
         #   $ python -m coverage
         #   Code coverage for Python.  Use '__main__.py help' for help.
-        out = self.run_command("python -m coverage")
-        assert "Use 'coverage help' for help" in out
+        out = self.run_command("python -m test_conclude")
+        assert "Use 'test_conclude help' for help" in out
 
 
 TRY_EXECFILE = os.path.join(os.path.dirname(__file__), "modules/process_test/try_execfile.py")
@@ -809,7 +809,7 @@ class EnvironmentTest(CoverageTest):
 
     def test_coverage_custom_script(self) -> None:
         # https://github.com/nedbat/coveragepy/issues/678
-        # If sys.path[0] isn't the Python default, then coverage.py won't
+        # If sys.path[0] isn't the Python default, then test_conclude.py won't
         # fiddle with it.
         self.make_file("a/b/c/thing.py", """\
             SOMETHING = "hello-xyzzy"
@@ -822,10 +822,10 @@ class EnvironmentTest(CoverageTest):
                 '/Users/somebody/temp/something/eggs/something-4.5.1-py2.7-xxx-10.13-x86_64.egg',
             ]
 
-            import coverage.cmdline
+            import test_conclude.cmdline
 
             if __name__ == '__main__':
-                sys.exit(coverage.cmdline.main())
+                sys.exit(test_conclude.cmdline.main())
             """)
         self.make_file("how_is_it.py", """\
             import pprint, sys
@@ -853,7 +853,7 @@ class EnvironmentTest(CoverageTest):
             #!{sys.executable}
             import re
             import sys
-            from coverage.cmdline import main
+            from test_conclude.cmdline import main
             if __name__ == '__main__':
                 sys.argv[0] = re.sub(r'(-script\\.pyw|\\.exe)?$', '', sys.argv[0])
                 sys.exit(main())
@@ -922,7 +922,7 @@ class ExcepthookTest(CoverageTest):
 
         # Read the coverage file and see that excepthook.py has 7 lines
         # executed.
-        data = coverage.CoverageData()
+        data = test_conclude.CoverageData()
         data.read()
         assert line_counts(data)['excepthook.py'] == 7
 
@@ -979,8 +979,8 @@ class AliasedCommandTest(CoverageTest):
     run_in_temp_dir = False
 
     def test_major_version_works(self) -> None:
-        # "coverage3" works on py3
-        cmd = "coverage%d" % sys.version_info[0]
+        # "test-conclude" is the fork's console script (no versioned aliases).
+        cmd = "test-conclude"
         out = self.run_command(cmd)
         assert "Code coverage for Python" in out
 
@@ -992,15 +992,13 @@ class AliasedCommandTest(CoverageTest):
         assert "Code coverage for Python" not in out
 
     def test_specific_alias_works(self) -> None:
-        # "coverage-3.9" works on py3.9
-        cmd = "coverage-%d.%d" % sys.version_info[:2]
+        # "test-conclude" is the fork's console script.
+        cmd = "test-conclude"
         out = self.run_command(cmd)
         assert "Code coverage for Python" in out
 
     @pytest.mark.parametrize("cmd", [
-        "coverage",
-        "coverage%d" % sys.version_info[0],
-        "coverage-%d.%d" % sys.version_info[:2],
+        "test-conclude",
     ])
     def test_aliases_used_in_messages(self, cmd: str) -> None:
         out = self.run_command(f"{cmd} foobar")
@@ -1026,10 +1024,10 @@ class PydocTest(CoverageTest):
             assert line.strip() in out
 
     def test_pydoc_coverage(self) -> None:
-        self.assert_pydoc_ok("coverage", coverage)
+        self.assert_pydoc_ok("test_conclude", test_conclude)
 
     def test_pydoc_coverage_coverage(self) -> None:
-        self.assert_pydoc_ok("coverage.Coverage", coverage.Coverage)
+        self.assert_pydoc_ok("test_conclude.Coverage", test_conclude.Coverage)
 
 
 class FailUnderTest(CoverageTest):
@@ -1086,7 +1084,7 @@ class CoverageCoreTest(CoverageTest):
     """Test that cores are chosen correctly."""
     # This doesn't test failure modes, only successful requests.
     try:
-        from coverage.tracer import CTracer
+        from test_conclude.tracer import CTracer
         has_ctracer = True
     except ImportError:
         has_ctracer = False
@@ -1218,7 +1216,7 @@ class ProcessStartupTest(CoverageTest):
         # An existing data file should not be read when a subprocess gets
         # measured automatically.  Create the data file here with bogus data in
         # it.
-        data = coverage.CoverageData(".mycovdata")
+        data = test_conclude.CoverageData(".mycovdata")
         data.add_lines({os.path.abspath('sub.py'): range(100)})
         data.write()
 
@@ -1234,7 +1232,7 @@ class ProcessStartupTest(CoverageTest):
 
         # Read the data from .coverage
         self.assert_exists(".mycovdata")
-        data = coverage.CoverageData(".mycovdata")
+        data = test_conclude.CoverageData(".mycovdata")
         data.read()
         assert line_counts(data)['sub.py'] == 3
 
@@ -1255,7 +1253,7 @@ class ProcessStartupTest(CoverageTest):
 
         # assert that the combined .coverage data file is correct
         self.assert_exists(".coverage")
-        data = coverage.CoverageData()
+        data = test_conclude.CoverageData()
         data.read()
         assert line_counts(data)['sub.py'] == 3
 
@@ -1344,7 +1342,7 @@ class ProcessStartupWithSourceTest(CoverageTest):
 
         # Read the data from .coverage
         self.assert_exists(".coverage")
-        data = coverage.CoverageData()
+        data = test_conclude.CoverageData()
         data.read()
         summary = line_counts(data)
         assert summary[source + '.py'] == 3

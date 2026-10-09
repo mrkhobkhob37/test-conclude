@@ -1,7 +1,7 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/nedbat/coveragepy/blob/master/NOTICE.txt
 
-"""Tests for XML reports from coverage.py."""
+"""Tests for XML reports from test_conclude.py."""
 
 from __future__ import annotations
 
@@ -14,11 +14,11 @@ from xml.etree import ElementTree
 
 import pytest
 
-import coverage
-from coverage import Coverage, env
-from coverage.exceptions import NoDataError
-from coverage.files import abs_file
-from coverage.misc import import_local_file
+import test_conclude
+from test_conclude import Coverage, env
+from test_conclude.exceptions import NoDataError
+from test_conclude.files import abs_file
+from test_conclude.misc import import_local_file
 
 from tests.coveragetest import CoverageTest
 from tests.goldtest import compare, gold_path
@@ -33,7 +33,7 @@ class XmlTestHelpers(CoverageTest):
         self.make_file("sub/__init__.py")
         self.make_file("sub/doit.py", "print('doit!')")
         self.make_file("main.py", "import sub.doit")
-        cov = coverage.Coverage(source=["."])
+        cov = test_conclude.Coverage(source=["."])
         self.start_import_stop(cov, "main")
         return cov
 
@@ -101,7 +101,7 @@ class XmlTestHelpersTest(XmlTestHelpers, CoverageTest):
 
 
 class XmlReportTest(XmlTestHelpers, CoverageTest):
-    """Tests of the XML reports from coverage.py."""
+    """Tests of the XML reports from test_conclude.py."""
 
     def make_mycode_data(self) -> None:
         """Pretend that we ran mycode.py, so we can report on it."""
@@ -110,7 +110,7 @@ class XmlReportTest(XmlTestHelpers, CoverageTest):
 
     def run_xml_report(self, **kwargs: Any) -> None:
         """Run xml_report()"""
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.xml_report(**kwargs)
 
@@ -122,7 +122,7 @@ class XmlReportTest(XmlTestHelpers, CoverageTest):
 
     def test_argument_affects_xml_placement(self) -> None:
         self.make_mycode_data()
-        cov = coverage.Coverage(messages=True)
+        cov = test_conclude.Coverage(messages=True)
         cov.load()
         cov.xml_report(outfile="put_it_there.xml")
         assert self.stdout() == "Wrote XML report to put_it_there.xml\n"
@@ -154,7 +154,7 @@ class XmlReportTest(XmlTestHelpers, CoverageTest):
         # Written while investigating a bug, might as well keep it.
         # https://github.com/nedbat/coveragepy/issues/208
         self.make_file("innocuous.py", "a = 4")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "innocuous")
         os.remove("innocuous.py")
         with pytest.warns(Warning) as warns:
@@ -194,7 +194,7 @@ class XmlReportTest(XmlTestHelpers, CoverageTest):
         # Used to raise a zero division error:
         # https://github.com/nedbat/coveragepy/issues/250
         self.make_file("empty.py", "")
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         empty = self.start_import_stop(cov, "empty")
         cov.xml_report([empty])
         dom = ElementTree.parse("coverage.xml")
@@ -236,7 +236,7 @@ class XmlReportTest(XmlTestHelpers, CoverageTest):
         self.make_file("src/main/foo.py", "a = 1")
         self.make_file("also/over/there/bar.py", "b = 2")
 
-        cov = coverage.Coverage(source=["src/main", "also/over/there", "not/really"])
+        cov = test_conclude.Coverage(source=["src/main", "also/over/there", "not/really"])
         with cov.collect():
             mod_foo = import_local_file("foo", "src/main/foo.py")
             mod_bar = import_local_file("bar", "also/over/there/bar.py")
@@ -278,7 +278,7 @@ class XmlReportTest(XmlTestHelpers, CoverageTest):
         # https://github.com/nedbat/coveragepy/issues/573
         self.make_file("테스트/program.py", "a = 1")
         with change_dir("테스트"):
-            cov = coverage.Coverage()
+            cov = test_conclude.Coverage()
             self.start_import_stop(cov, "program")
             cov.xml_report()
 
@@ -286,7 +286,7 @@ class XmlReportTest(XmlTestHelpers, CoverageTest):
         # Make a file with a non-ascii character in the filename.
         self.make_file("h\xe2t.py", "print('accented')")
         self.make_data_file(lines={abs_file("h\xe2t.py"): [1]})
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.xml_report()
         # The XML report is always UTF8-encoded.
@@ -301,7 +301,7 @@ class XmlReportTest(XmlTestHelpers, CoverageTest):
         self.make_data_file(lines={abs_file("\xe2/accented.py"): [1]})
 
         # The XML report is always UTF8-encoded.
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         cov.load()
         cov.xml_report()
         with open("coverage.xml", "rb") as xmlf:
@@ -330,7 +330,7 @@ class XmlReportTest(XmlTestHelpers, CoverageTest):
 
         # no source path passed to coverage!
         # problem occurs when they are dynamically generated during xml report
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         with cov.collect():
             import_local_file("foo", "namespace/package/__init__.py")
 
@@ -357,7 +357,7 @@ class XmlReportTest(XmlTestHelpers, CoverageTest):
         self.make_file("x01y.py", "print('x01y')")
         self.make_file("x001y.py", "print('x001y')")
 
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         self.start_import_stop(cov, "main")
         assert self.stdout() == "x1y\nx01y\nx001y\n"
         # This used to raise:
@@ -377,7 +377,7 @@ def unbackslash(v: Any) -> Any:
 
 
 class XmlPackageStructureTest(XmlTestHelpers, CoverageTest):
-    """Tests about the package structure reported in the coverage.xml file."""
+    """Tests about the package structure reported in the test_conclude.xml file."""
 
     def package_and_class_tags(self, cov: Coverage) -> Iterator[tuple[str, dict[str, Any]]]:
         """Run an XML report on `cov`, and get the package and class tags."""
@@ -396,7 +396,7 @@ class XmlPackageStructureTest(XmlTestHelpers, CoverageTest):
         self.make_file("main.py", """\
             from d0.d0 import f0
             """)
-        cov = coverage.Coverage(source=["."])
+        cov = test_conclude.Coverage(source=["."])
         self.start_import_stop(cov, "main")
         self.assert_package_and_class_tags(cov, [
             ('package', {'name': "."}),
@@ -414,7 +414,7 @@ class XmlPackageStructureTest(XmlTestHelpers, CoverageTest):
         self.make_file("main.py", """\
             from d0.d0 import f0
             """)
-        cov = coverage.Coverage(source=["."])
+        cov = test_conclude.Coverage(source=["."])
         self.start_import_stop(cov, "main")
 
         cov.set_option("xml:package_depth", 1)
@@ -435,7 +435,7 @@ class XmlPackageStructureTest(XmlTestHelpers, CoverageTest):
         self.make_file("main.py", """\
             from d0.d0 import f0
             """)
-        cov = coverage.Coverage(source=["."])
+        cov = test_conclude.Coverage(source=["."])
         self.start_import_stop(cov, "main")
 
         cov.set_option("xml:package_depth", 2)
@@ -457,7 +457,7 @@ class XmlPackageStructureTest(XmlTestHelpers, CoverageTest):
         self.make_file("main.py", """\
             from d0.d0 import f0
             """)
-        cov = coverage.Coverage(source=["."])
+        cov = test_conclude.Coverage(source=["."])
         self.start_import_stop(cov, "main")
 
         cov.set_option("xml:package_depth", 3)
@@ -479,7 +479,7 @@ class XmlPackageStructureTest(XmlTestHelpers, CoverageTest):
         # https://github.com/nedbat/coveragepy/issues/465
         # https://github.com/nedbat/coveragepy/issues/526
         self.make_file("src/mod.py", "print(17)")
-        cov = coverage.Coverage(source=["src"])
+        cov = test_conclude.Coverage(source=["src"])
         self.start_import_stop(cov, "mod", modfile="src/mod.py")
 
         self.assert_package_and_class_tags(cov, [
@@ -494,7 +494,7 @@ class XmlPackageStructureTest(XmlTestHelpers, CoverageTest):
         if trail == "\\" and not env.WINDOWS:
             pytest.skip("trailing backslash is only for Windows")
         self.make_file("src/mod.py", "print(17)")
-        cov = coverage.Coverage(source=[f"src{trail}"])
+        cov = test_conclude.Coverage(source=[f"src{trail}"])
         cov.set_option("run:relative_files", True)
         self.start_import_stop(cov, "mod", modfile="src/mod.py")
         cov.xml_report()
@@ -506,7 +506,7 @@ class XmlPackageStructureTest(XmlTestHelpers, CoverageTest):
 
 def compare_xml(expected: str, actual: str, actual_extra: bool = False) -> None:
     """Specialized compare function for our XML files."""
-    source_path = coverage.files.relative_directory().rstrip(r"\/")
+    source_path = test_conclude.files.relative_directory().rstrip(r"\/")
 
     scrubs=[
         (r' timestamp="\d+"', ' timestamp="TIMESTAMP"'),
@@ -529,7 +529,7 @@ class XmlGoldTest(CoverageTest):
                 a = 4
             """)
 
-        cov = coverage.Coverage()
+        cov = test_conclude.Coverage()
         a = self.start_import_stop(cov, "a")
         cov.xml_report(a, outfile="coverage.xml")
         compare_xml(gold_path("xml/x_xml"), ".", actual_extra=True)
@@ -549,7 +549,7 @@ class XmlGoldTest(CoverageTest):
             output = xml_2/coverage.xml
             """)
 
-        cov = coverage.Coverage(config_file="run_a_xml_2.ini")
+        cov = test_conclude.Coverage(config_file="run_a_xml_2.ini")
         a = self.start_import_stop(cov, "a")
         cov.xml_report(a)
         compare_xml(gold_path("xml/x_xml"), "xml_2")
@@ -565,7 +565,7 @@ class XmlGoldTest(CoverageTest):
             assert choice(1) == 3
             """)
 
-        cov = coverage.Coverage(branch=True)
+        cov = test_conclude.Coverage(branch=True)
         y = self.start_import_stop(cov, "y")
         cov.xml_report(y, outfile="y_xml_branch/coverage.xml")
         compare_xml(gold_path("xml/y_xml_branch"), "y_xml_branch")

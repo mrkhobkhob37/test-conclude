@@ -9,9 +9,9 @@ from typing import IO, Iterable
 
 import pytest
 
-from coverage.exceptions import CoverageException
-from coverage.report_core import render_report
-from coverage.types import TMorf
+from test_conclude.exceptions import CoverageException
+from test_conclude.report_core import render_report
+from test_conclude.types import TMorf
 
 from tests.coveragetest import CoverageTest
 

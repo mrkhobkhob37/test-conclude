@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import pytest
 
-from coverage.misc import import_local_file
+from test_conclude.misc import import_local_file
 
 from tests.mixins import TempDirMixin, RestoreModulesMixin
 

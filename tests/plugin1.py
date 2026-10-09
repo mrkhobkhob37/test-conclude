@@ -10,9 +10,9 @@ import os.path
 from types import FrameType
 from typing import Any
 
-from coverage import CoveragePlugin, FileReporter, FileTracer
-from coverage.plugin_support import Plugins
-from coverage.types import TLineNo
+from test_conclude import CoveragePlugin, FileReporter, FileTracer
+from test_conclude.plugin_support import Plugins
+from test_conclude.types import TLineNo
 
 class Plugin(CoveragePlugin):
     """A file tracer plugin to import, so that it isn't in the test's current directory."""
