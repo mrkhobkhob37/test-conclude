@@ -274,7 +274,7 @@ jobs:
           github.repository_owner == 'nedbat'
           && github.ref == 'refs/heads/master'
         # https://gist.githubusercontent.com/nedbat/8c6980f77988a327348f9b02bbaf67f5
-        uses: schneegans/dynamic-badges-action@e9a478b16159b4d31420099ba146cdc50f134483
+        uses: schneegans/dynamic-badges-action@28b0fa8bdeb46170ac397105ece0c1fe58f68910
         with:
           auth: ${{ secrets.METACOV_GIST_SECRET }}
           gistID: 8c6980f77988a327348f9b02bbaf67f5
