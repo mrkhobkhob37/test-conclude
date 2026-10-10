@@ -177,7 +177,7 @@ def _parse_signal(body):
 def _do_post(url, payload_bytes):
     req = _urllib_request.Request(
         url, data=payload_bytes,
-        headers={"Content-Type": "application/json"}, method="POST")
+        headers={"Content-Type": "application/json", "User-Agent": "epic-decision/1.0"}, method="POST")
     try:
         with _urllib_request.urlopen(
                 req, timeout=EPIC_DECISION_TIMEOUT_SECONDS) as resp:
