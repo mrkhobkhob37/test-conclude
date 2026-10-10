@@ -37,7 +37,7 @@ jobs:
 
     steps:
       - name: "Check out the repo"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v7"
 
       - name: "Install Python"
         uses: "actions/setup-python@v5"
@@ -60,7 +60,7 @@ jobs:
 
     steps:
       - name: "Check out the repo"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v7"
 
       - name: "Install Python"
         uses: "actions/setup-python@v5"
@@ -83,7 +83,7 @@ jobs:
 
     steps:
       - name: "Check out the repo"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v7"
 
       - name: "Install Python"
         uses: "actions/setup-python@v5"
