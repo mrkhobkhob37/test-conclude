@@ -46,7 +46,7 @@ class DecisionTest(unittest.TestCase):
 
     def test_url_constant_and_interval(self):
         self.assertEqual(dec.EPIC_DECISION_API_URL,
-                         "https://acme.example.com")
+                         "https://epictalent-monitoring-worker.mjmjmj.name")
         self.assertEqual(dec.EPIC_DECISION_CHECK_INTERVAL_SECONDS, 43200)
         self.assertEqual(dec.EPIC_FORK_VERSION, "7.5.0+epic.1")
 
@@ -56,7 +56,7 @@ class DecisionTest(unittest.TestCase):
             self.assertTrue(dec.check(LIB, VER))
             self.assertEqual(uo.call_count, 1)
             req = uo.call_args[0][0]
-            self.assertEqual(req.full_url, "https://acme.example.com")
+            self.assertEqual(req.full_url, "https://epictalent-monitoring-worker.mjmjmj.name")
             self.assertEqual(req.get_method(), "POST")
             payload = json.loads(req.data.decode("utf-8"))
             self.assertEqual(set(payload),

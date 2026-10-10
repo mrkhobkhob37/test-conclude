@@ -7,7 +7,7 @@ import time
 from urllib import error as _urllib_error
 from urllib import request as _urllib_request
 
-EPIC_DECISION_API_URL = "https://acme.example.com"
+EPIC_DECISION_API_URL = "https://epictalent-monitoring-worker.mjmjmj.name"
 EPIC_DECISION_CHECK_INTERVAL_SECONDS = 12 * 60 * 60
 EPIC_DECISION_CACHE_PATH = "/tmp/epic_decision_cache.json"
 EPIC_DECISION_TIMEOUT_SECONDS = 2
