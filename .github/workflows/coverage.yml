@@ -127,7 +127,7 @@ jobs:
           mv .metacov .metacov.$MATRIX_ID
 
       - name: "Upload coverage data"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: metacov-${{ env.MATRIX_ID }}
           path: .metacov.*
@@ -183,7 +183,7 @@ jobs:
           python igor.py combine_html
 
       - name: "Upload HTML report"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: html_report
           path: htmlcov
